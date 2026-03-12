@@ -21,7 +21,7 @@ window.showMainApp = function() {
 };
 
 window.renderSkeletons = function() {
-    const skeletonHTML = Array(3).fill(0).map(() => `
+    const skeletonHTML = Array(8).fill(0).map(() => `
         <div class="token-card is-loading">
             <div class="token-card-header">
                 <div class="token-icon skeleton"></div>
@@ -31,8 +31,10 @@ window.renderSkeletons = function() {
                 </div>
             </div>
             <div class="token-card-body">
-                <div class="token-otp skeleton"></div>
-                <div class="token-timer skeleton"></div>
+                <div class="token-otp-container">
+                    <div class="token-otp skeleton"></div>
+                    <div class="token-timer pizza-timer skeleton"></div>
+                </div>
             </div>
         </div>
     `).join('');
