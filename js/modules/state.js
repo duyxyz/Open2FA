@@ -9,9 +9,6 @@ const STORAGE_KEYS = {
 // Default settings
 const DEFAULT_SETTINGS = {
     darkMode: false,
-    autoLock: 5,
-    copyEffects: true,
-    copyEffects: true,
     sync: {
         enabled: true,
         url: 'https://reyhwybahpgtgqsofjdc.supabase.co',
@@ -48,7 +45,7 @@ window.cacheDOMElements = function() {
     DOM.tokenGrid = document.getElementById('tokenGrid');
     DOM.emptyState = document.getElementById('emptyState');
     DOM.searchInput = document.getElementById('searchInput');
-    DOM.tokenCount = document.getElementById('tokenCount');
+
 
     DOM.badgeAll = document.getElementById('badgeAll');
     DOM.toastContainer = document.getElementById('toastContainer');

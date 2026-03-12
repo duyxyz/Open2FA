@@ -808,6 +808,20 @@ input:checked+.slider {
   background: var(--primary);
 }
 
+[data-theme="dark"] .slider {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] input:checked+.slider {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] input:checked+.slider:before {
+  background: var(--on-primary);
+}
+
 input:checked+.slider:before {
   transform: translateX(22px);
 }

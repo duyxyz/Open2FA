@@ -314,14 +314,8 @@ window.setupEventListeners = function() {
     if (DOM.authForm) DOM.authForm.addEventListener('submit', (e) => window.handleAuthAction(e));
     bind(DOM.btnSignOut, 'click', () => window.handleSignOut());
     
-    bind(DOM.autoSyncToggle, 'change', (e) => {
-        appState.settings.sync.enabled = e.target.checked;
-        saveSettings();
-    });
+    // Simplified settings - removed sync toggles from UI
 
-    bind(DOM.btnEditSyncConfig, 'click', () => {
-        if (DOM.syncFields) DOM.syncFields.style.display = DOM.syncFields.style.display === 'none' ? 'block' : 'none';
-    });
 
     // 2. Header & Main Buttons
     bindById('btnAddToken', 'click', () => { switchTab('scan'); openModal('addTokenModal'); });

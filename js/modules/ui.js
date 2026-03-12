@@ -253,7 +253,6 @@ window.openEditModal = function(id) {
 window.updateBadgeCounts = function() {
     const total = appState.tokens.length;
     DOM.badgeAll.textContent = total;
-    DOM.tokenCount.textContent = `${total} token${total !== 1 ? 's' : ''}`;
 };
 
 // function window.updateStats removed as per cloud-only requirement

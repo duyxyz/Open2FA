@@ -14,11 +14,10 @@
       if (appState.settings.sync) {
         if (DOM.supabaseUrl) DOM.supabaseUrl.value = appState.settings.sync.url || '';
         if (DOM.supabaseKey) DOM.supabaseKey.value = appState.settings.sync.key || '';
-        if (DOM.autoSyncToggle) DOM.autoSyncToggle.checked = appState.settings.sync.enabled;
       }
 
-      // Start the app directly
-      initAppLayout();
+      // Start the app layout (render tokens, etc.)
+      if (window.initAppLayout) window.initAppLayout();
       
       // Initialize sync if enabled
       if (window.initSync) await window.initSync();
