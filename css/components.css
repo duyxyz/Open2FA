@@ -7,6 +7,7 @@
   cursor: grab;
   position: relative;
   overflow: hidden;
+  -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: element;
 }
@@ -1090,11 +1091,95 @@ input:checked+.slider:before {
   }
 
   .content {
-    padding: 16px;
+    padding: 0; /* Edge-to-edge list as requested */
   }
 
   .token-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+
+  .token-card {
+    background: var(--bg-primary);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 12px 16px; /* Keeping internal padding so content doesn't hit the bezel */
+    box-shadow: none;
+    transition: background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .token-card:last-child {
+    border-bottom: none;
+  }
+
+  .token-card:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: var(--bg-primary); /* Disable grey flash on tap toggle */
+  }
+
+  .token-card-header {
+    margin-bottom: 4px;
+    gap: 12px;
+  }
+
+  .token-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .token-name {
+    font-size: 15px;
+  }
+
+  .token-account {
+    font-size: 13px;
+  }
+
+  .token-otp {
+    font-size: 26px;
+    padding: 6px 16px; /* Matched exactly with PC */
+    line-height: 1; /* Pure height: 26px */
+    background: var(--bg-tertiary);
+    border: none; /* Removed border to match PC */
+    border-radius: var(--radius);
+    width: fit-content;
+    display: block; /* Simpler block for precise height */
+    font-weight: 700;
+  }
+
+  .token-card-body {
+    padding-left: 52px;
+  }
+
+  /* Skeleton Mobile Alignment - Pixel Perfect */
+  .token-card.is-loading {
+    padding: 12px 16px;
+    background: var(--bg-primary);
+  }
+  
+  .token-card.is-loading .token-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .token-card.is-loading .token-card-header {
+    margin-bottom: 4px;
+  }
+  
+  .token-card.is-loading .token-otp {
+    height: 38px; /* 26px font + 12px vertical padding = 38px exactly */
+    width: 140px;
+  }
+
+  .token-timer {
+    width: 28px;
+    height: 28px;
   }
 
   .modal-container {
