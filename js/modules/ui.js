@@ -1,15 +1,5 @@
 // UI functions
-window.showLockScreen = function() {
-    DOM.lockScreen.setAttribute('aria-hidden', 'false');
-    DOM.mainApp.setAttribute('aria-hidden', 'true');
-    setTimeout(() => DOM.unlockPassword.focus(), 100);
-};
-
-window.showMainApp = function() {
-    DOM.lockScreen.setAttribute('aria-hidden', 'true');
-    DOM.mainApp.setAttribute('aria-hidden', 'false');
-    
-    // Show skeleton first
+window.initAppLayout = function() {
     renderSkeletons();
     
     // Delayed actual render for visual effect
@@ -96,8 +86,6 @@ window.generateId = function() {
 window.renderTokens = function(force = false) {
     const totalTokens = appState.tokens.length;
     
-    // Check if we need to rebuild the grid (add/remove tokens)
-    // Or if it's the first time
     const currentCardsCount = DOM.tokenGrid.children.length;
     
     if (totalTokens === 0) {
@@ -109,21 +97,19 @@ window.renderTokens = function(force = false) {
 
     DOM.emptyState.classList.remove('active');
 
-    // If tokens were added or removed, or grid is empty, or forced, rebuild everything
     if (force || totalTokens !== currentCardsCount) {
         DOM.tokenGrid.innerHTML = appState.tokens.map((token, index) => createTokenCard(token, index)).join('');
         attachTokenEvents();
-        updateTokens(); // Update values immediately
+        updateTokens();
     }
 
-    // Now handle filtering (Category/Search) by toggling visibility
     const filteredIds = new Set(filterTokens(appState.tokens).map(t => t.id));
     
     Array.from(DOM.tokenGrid.children).forEach(card => {
         const id = card.dataset.id;
         if (filteredIds.has(id)) {
             card.style.display = '';
-            card.classList.remove('filtering'); // Prevent re-triggering animation
+            card.classList.remove('filtering');
         } else {
             card.style.display = 'none';
         }
@@ -179,7 +165,6 @@ window.createTokenCard = function(token, index) {
 };
 
 window.attachTokenEvents = function() {
-    // Edit button
     document.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -188,7 +173,6 @@ window.attachTokenEvents = function() {
       });
     });
 
-    // Card click - Copy token and ripple
     document.querySelectorAll('.token-card').forEach(card => {
       card.addEventListener('click', async (e) => {
         if (window.createRipple) {
@@ -204,7 +188,6 @@ window.attachTokenEvents = function() {
         }
       });
 
-      // Drag and Drop
       card.addEventListener('dragstart', (e) => {
         card.classList.add('dragging');
         e.dataTransfer.setData('text/plain', card.dataset.id);
@@ -253,7 +236,6 @@ window.reorderTokens = function(draggedId, targetId) {
         appState.tokens = tokens;
         saveTokens();
         
-        // Small delay to let drop finish
         setTimeout(() => {
             renderTokens(true);
             saveActivity({ type: 'reorder', text: `Đổi vị trí: ${removed.name}` });
@@ -292,7 +274,7 @@ let updateInterval;
 window.startTokenUpdate = function() {
     if (updateInterval) clearInterval(updateInterval);
     updateTokens();
-    updateInterval = setInterval(updateTokens, 50); // 50ms for smooth animation
+    updateInterval = setInterval(updateTokens, 50); 
 };
 
 window.updateTokens = async function() {
@@ -305,7 +287,6 @@ window.updateTokens = async function() {
 
       if (otpElement) {
         const fullTime = Math.floor(Date.now() / 1000);
-        // Only update OTP text if the second has changed to avoid UI flickering
         if (!otpElement.lastUpdate || otpElement.lastUpdate !== fullTime) {
             TOTP.generateAsync(token.secret).then(code => {
                 otpElement.textContent = code;
@@ -315,12 +296,10 @@ window.updateTokens = async function() {
       }
 
       if (timerCircle) {
-        // Circumference for r=8 is 2 * PI * 8 = 50.265
         const circumference = 50.265;
         const offset = (percentage / 100) * circumference;
         timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
         
-        // Change color when less than 5 seconds
         if (timeRemaining <= 5) {
           timerCircle.style.stroke = 'var(--danger)';
         } else {

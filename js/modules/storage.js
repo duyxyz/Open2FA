@@ -1,4 +1,4 @@
-// Load state from localStorage
+// Storage Management
 window.loadState = function() {
     // Load settings
     const settingsJson = localStorage.getItem(STORAGE_KEYS.SETTINGS);
@@ -35,6 +35,7 @@ window.loadState = function() {
 window.saveTokens = function() {
     localStorage.setItem(STORAGE_KEYS.TOKENS, JSON.stringify(appState.tokens));
     if(window.updateStats) window.updateStats();
+    if(window.pushToCloud) window.pushToCloud();
 };
 
 window.saveSettings = function() {
@@ -49,13 +50,4 @@ window.saveActivity = function(activity) {
     });
     if (activities.length > 100) activities.pop();
     localStorage.setItem(STORAGE_KEYS.ACTIVITY, JSON.stringify(activities));
-};
-
-window.checkLock = async function() {
-    const hasPassword = localStorage.getItem(STORAGE_KEYS.PASSWORD_HASH);
-    
-    if (!hasPassword) {
-      appState.isLocked = false;
-      if(window.showMainApp) window.showMainApp();
-    }
 };

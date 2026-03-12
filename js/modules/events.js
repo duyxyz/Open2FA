@@ -162,43 +162,6 @@ window.handleKeyboard = function(e) {
     }
 };
 
-window.handleUnlock = async function(e) {
-    e.preventDefault();
-    const password = DOM.unlockPassword.value;
-    const storedHash = localStorage.getItem(STORAGE_KEYS.PASSWORD_HASH);
-
-    if (await hashPassword(password) === storedHash) {
-      appState.isLocked = false;
-      showMainApp();
-      DOM.unlockPassword.value = '';
-    } else {
-      showToast('Mật khẩu không đúng', 'error');
-    }
-};
-
-window.handleSavePassword = async function() {
-    const newPass = document.getElementById('newPassword').value;
-    const confirmPass = document.getElementById('confirmPassword').value;
-
-    if (newPass !== confirmPass) {
-      showToast('Mật khẩu không khớp', 'error');
-      return;
-    }
-
-    if (newPass.length < 4) {
-      showToast('Mật khẩu phải có ít nhất 4 ký tự', 'error');
-      return;
-    }
-
-    const hash = await hashPassword(newPass);
-    localStorage.setItem(STORAGE_KEYS.PASSWORD_HASH, hash);
-    closeModal('passwordModal');
-    showToast('Đã thiết lập mật khẩu thành công', 'success');
-    
-    document.getElementById('newPassword').value = '';
-    document.getElementById('confirmPassword').value = '';
-};
-
 window.handleSaveToken = function() {
     const name = document.getElementById('tokenName').value.trim();
     const account = document.getElementById('tokenAccount').value.trim();
@@ -328,30 +291,32 @@ window.handleDeleteToken = function() {
     }
 };
 
-window.setupEventListeners = function() {
-    // Unlock form
-    DOM.unlockForm.addEventListener('submit', handleUnlock);
+window.handleSaveSync = async function() {
+    const url = DOM.supabaseUrl.value.trim();
+    const key = DOM.supabaseKey.value.trim();
+    const id = DOM.syncId.value.trim();
+
+    if (!url || !key || !id) {
+        showToast('Vui lòng điền đầy đủ các trường đồng bộ', 'error');
+        return;
+    }
+
+    appState.settings.sync.url = url;
+    appState.settings.sync.key = key;
+    appState.settings.sync.id = id;
+    appState.settings.sync.enabled = true;
+    DOM.syncEnabledToggle.checked = true;
+
+    saveSettings();
     
-    // Setup password button
-    document.getElementById('btnSetupPassword').addEventListener('click', () => {
-      openModal('passwordModal');
-    });
+    if (window.initSync) {
+        await window.initSync();
+        // Option to push local data immediately if cloud is empty
+        await window.pushToCloud();
+    }
+};
 
-    // Toggle password visibility
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const input = this.previousElementSibling;
-        const icon = this.querySelector('i');
-        if (input.type === 'password') {
-          input.type = 'text';
-          icon.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-          input.type = 'password';
-          icon.classList.replace('fa-eye-slash', 'fa-eye');
-        }
-      });
-    });
-
+window.setupEventListeners = function() {
     // Google Auth Import logic
     document.getElementById('otpauthUri').addEventListener('input', handleGoogleAuthPaste);
 
@@ -422,8 +387,6 @@ window.setupEventListeners = function() {
     document.getElementById('btnDeleteToken').addEventListener('click', handleDeleteToken);
 
     // Settings
-    document.getElementById('btnSetPassword').addEventListener('click', () => openModal('passwordModal'));
-    document.getElementById('btnSavePassword').addEventListener('click', handleSavePassword);
     document.getElementById('autoLockTime').addEventListener('change', (e) => {
       appState.settings.autoLock = parseInt(e.target.value);
       saveSettings();
@@ -437,6 +400,16 @@ window.setupEventListeners = function() {
       appState.settings.copyEffects = e.target.checked;
       saveSettings();
     });
+
+    // Sync
+    DOM.syncEnabledToggle.addEventListener('change', (e) => {
+      appState.settings.sync.enabled = e.target.checked;
+      DOM.syncFields.style.display = e.target.checked ? 'block' : 'none';
+      saveSettings();
+      if (!e.target.checked && window.initSync) window.initSync();
+    });
+
+    DOM.btnSaveSync.addEventListener('click', handleSaveSync);
 
     // Export
     document.getElementById('btnExportJson').addEventListener('click', exportJSON);
