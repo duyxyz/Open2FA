@@ -164,13 +164,7 @@ window.createTokenCard = function(token, index) {
         <div class="token-card-body">
           <div class="token-otp-container">
             <div class="token-otp" id="otp-${token.id}">------</div>
-            <div class="token-timer">
-              <svg viewBox="0 0 36 36">
-                <circle class="token-timer-bg" cx="18" cy="18" r="16"></circle>
-                <circle class="token-timer-progress" id="timer-${token.id}" cx="18" cy="18" r="16" stroke-dasharray="100, 100"></circle>
-              </svg>
-              <div class="token-timer-text" id="timer-text-${token.id}">30</div>
-            </div>
+            <div class="token-timer pizza-timer" id="timer-${token.id}"></div>
           </div>
         </div>
       </div>
@@ -301,7 +295,6 @@ window.updateTokens = async function() {
     for (const token of tokens) {
       const otpElement = document.getElementById(`otp-${token.id}`);
       const timerCircle = document.getElementById(`timer-${token.id}`);
-      const timerText = document.getElementById(`timer-text-${token.id}`);
 
       if (otpElement) {
         const fullTime = Math.floor(Date.now() / 1000);
@@ -315,19 +308,10 @@ window.updateTokens = async function() {
       }
 
       if (timerCircle) {
-        // High-precision stroke update
-        timerCircle.style.strokeDasharray = `${percentage}, 100`;
+        const angle = (percentage / 100) * 360;
+        const color = timeRemaining <= 5 ? 'var(--danger)' : '#374151';
         
-        // Change color when less than 5 seconds
-        if (timeRemaining <= 5) {
-          timerCircle.style.stroke = 'var(--danger)';
-        } else {
-          timerCircle.style.stroke = 'var(--success)';
-        }
-      }
-
-      if (timerText) {
-        timerText.textContent = Math.ceil(timeRemaining);
+        timerCircle.style.background = `conic-gradient(${color} ${angle}deg, var(--bg-tertiary) 0deg)`;
       }
     }
 };
