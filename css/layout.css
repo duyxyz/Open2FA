@@ -11,11 +11,12 @@
   top: 0;
   z-index: 100;
   backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 [data-theme="dark"] .header {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(13, 17, 23, 0.8);
 }
 
 .header-left, .header-right {
@@ -100,7 +101,7 @@
 
 .btn-icon:hover {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -143,7 +144,7 @@
 
 .category.active {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
 }
 
 .category .badge {

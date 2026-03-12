@@ -38,7 +38,7 @@
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: var(--bg-tertiary);
+  background-color: #e5e7eb;
   border-radius: var(--radius-sm);
 }
 
@@ -52,21 +52,21 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6),
     transparent
   );
   animation: skeletonLoading 1.5s infinite;
 }
 
 [data-theme="dark"] .skeleton {
-  background-color: var(--bg-secondary);
+  background-color: #21262d; 
 }
 
 [data-theme="dark"] .skeleton::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.08),
     transparent
   );
 }
@@ -79,7 +79,7 @@
   position: relative;
   overflow: hidden;
   color: transparent !important;
-  border-color: rgba(0,0,0,0.05) !important;
+  border-color: var(--border) !important;
   background-image: none !important;
 }
 
@@ -253,7 +253,7 @@
 
 .pizza-slice {
   fill: none;
-  stroke: #374151;
+  stroke: var(--timer-color);
   transition: stroke 0.3s ease;
 }
 
@@ -277,7 +277,7 @@
 .edit-btn:hover {
   background: var(--primary);
   border-color: var(--primary);
-  color: white;
+  color: var(--on-primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
@@ -331,7 +331,7 @@
 .btn-primary {
   padding: 12px 24px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border: none;
   border-radius: var(--radius-lg);
   font-size: 14px;
@@ -451,6 +451,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .modal-container {
@@ -659,7 +660,7 @@
 
 .btn-generate-secret:hover {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border-color: var(--primary);
 }
 

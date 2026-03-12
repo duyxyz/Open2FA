@@ -324,7 +324,7 @@ window.updateTokens = async function() {
         if (timeRemaining <= 5) {
           timerCircle.style.stroke = 'var(--danger)';
         } else {
-          timerCircle.style.stroke = '#374151';
+          timerCircle.style.stroke = 'var(--timer-color)';
         }
       }
     }
