@@ -7,10 +7,19 @@
       try {
         const settings = JSON.parse(localStorage.getItem('secureauth_settings'));
         const darkMode = settings ? settings.darkMode : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (darkMode) document.documentElement.classList.add('dark-theme');
+        if (darkMode) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
       } catch (e) {}
     })();
   </script>
+  <style>
+    /* Immediate background color to prevent FOUC (flash of unstyled content) */
+    html[data-theme="dark"], 
+    html[data-theme="dark"] body {
+      background: #0d1117 !important;
+    }
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open2FA - Trình xác thực mã OTP an toàn</title>
   <link rel="stylesheet" href="css/variables.css">
