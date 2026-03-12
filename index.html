@@ -2,6 +2,15 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function() {
+      try {
+        const settings = JSON.parse(localStorage.getItem('secureauth_settings'));
+        const darkMode = settings ? settings.darkMode : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (darkMode) document.documentElement.classList.add('dark-theme');
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Open2FA - Trình xác thực mã OTP an toàn</title>
   <link rel="stylesheet" href="css/variables.css">
@@ -24,8 +33,8 @@
 </head>
 <body>
   <div id="app">
-    <!-- Login Gate - shown when not authenticated -->
-    <div id="loginGate" class="login-gate">
+    <!-- Login Gate - hidden by default -->
+    <div id="loginGate" class="login-gate" style="display:none;">
       <div class="login-gate-card">
         <div class="login-gate-logo">
           <i class="fas fa-shield-halved"></i>
@@ -55,7 +64,7 @@
     </div>
 
     <!-- Main App - hidden until authenticated -->
-    <div id="mainApp" class="main-app" style="display:none;">
+    <div id="mainApp" class="main-app">
       <!-- Header -->
       <header class="header">
         <div class="header-left">
@@ -73,9 +82,6 @@
         <div class="header-right">
           <button id="btnAddToken" class="btn-icon" title="Thêm token">
             <i class="fas fa-plus"></i>
-          </button>
-          <button id="btnSettings" class="btn-icon" title="Cài đặt">
-            <i class="fas fa-cog"></i>
           </button>
 
           <div class="user-profile" id="userProfile" style="display: none;">
@@ -225,58 +231,6 @@
       </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal" aria-hidden="true">
-      <div class="modal-overlay" data-close="settingsModal"></div>
-      <div class="modal-container modal-md">
-        <div class="modal-header">
-          <h2><i class="fas fa-cog"></i> Cài đặt</h2>
-          <button class="modal-close" data-close="settingsModal">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="settings-section">
-            <h3>Giao diện</h3>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Chế độ tối</label>
-                <p>Sử dụng giao diện tối</p>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="darkModeToggle">
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
-          <div class="settings-section">
-            <h3>Sao lưu & Khôi phục</h3>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Xuất dữ liệu</label>
-                <p>Tải file sao lưu mã hóa</p>
-              </div>
-              <button class="btn-secondary btn-sm" id="btnExport">
-                <i class="fas fa-download"></i> Xuất
-              </button>
-            </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Nhập dữ liệu</label>
-                <p>Khôi phục từ file sao lưu</p>
-              </div>
-              <button class="btn-secondary btn-sm" id="btnImport">
-                <i class="fas fa-upload"></i> Nhập
-              </button>
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button class="btn-ghost" data-close="settingsModal">Đóng</button>
-        </div>
-      </div>
-    </div>
 
 
 
@@ -437,17 +391,54 @@
               <h3 id="userEmailText">user@example.com</h3>
               <p class="status-online">Đang trực tuyến</p>
             </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Đồng bộ tự động</label>
-                <p>Tự động lưu lên đám mây</p>
+            
+            <div class="settings-section">
+              <h3>Giao diện</h3>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <label>Chế độ tối</label>
+                  <p>Sử dụng giao diện tối</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="darkModeToggle">
+                  <span class="slider"></span>
+                </label>
               </div>
-              <label class="switch">
-                <input type="checkbox" id="autoSyncToggle" checked>
-                <span class="slider"></span>
-              </label>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <label>Đồng bộ tự động</label>
+                  <p>Tự động lưu lên đám mây</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="autoSyncToggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
             </div>
-            <button class="btn-danger w-full" id="btnSignOut" style="width: 100%; margin-top: 24px;">
+
+            <div class="settings-section">
+              <h3>Sao lưu & Khôi phục</h3>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <label>Sao lưu dữ liệu</label>
+                  <p>Tải file sao lưu (JSON/AES)</p>
+                </div>
+                <button class="btn-secondary btn-sm" id="btnExport">
+                  <i class="fas fa-download"></i> Xuất
+                </button>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <label>Khôi phục dữ liệu</label>
+                  <p>Nhập từ file sao lưu</p>
+                </div>
+                <button class="btn-secondary btn-sm" id="btnImport">
+                  <i class="fas fa-upload"></i> Nhập
+                </button>
+              </div>
+            </div>
+
+            <button class="btn-danger w-full" id="btnSignOut" style="width: 100%; margin-top: 16px;">
               <i class="fas fa-sign-out-alt"></i> Đăng xuất
             </button>
           </div>

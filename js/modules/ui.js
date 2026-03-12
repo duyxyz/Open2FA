@@ -57,7 +57,25 @@ window.switchTab = function(tabName) {
 };
 
 window.openModal = function(modalId) {
-    document.getElementById(modalId).setAttribute('aria-hidden', 'false');
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    if ((modalId === 'addTokenModal' || modalId === 'exportModal') && !appState.currentUser) {
+        showToast('Vui lòng đăng nhập để sử dụng tính năng này', 'info');
+        // When opening authModal from a restricted action, show it as modal, not dropdown
+        document.getElementById('authModal').classList.remove('dropdown');
+        document.getElementById('authModal').setAttribute('aria-hidden', 'false');
+        return;
+    }
+
+    // Special handling for authModal when logged in: show as dropdown
+    if (modalId === 'authModal' && appState.currentUser) {
+        modal.classList.add('dropdown');
+    } else {
+        modal.classList.remove('dropdown');
+    }
+
+    modal.setAttribute('aria-hidden', 'false');
 };
 
 window.closeModal = function(modalId) {
@@ -276,11 +294,8 @@ window.updateTokens = async function() {
         const offset = (percentage / 100) * circumference;
         timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
         
-        if (timeRemaining <= 5) {
-          timerCircle.style.stroke = 'var(--danger)';
-        } else {
-          timerCircle.style.stroke = 'var(--timer-color)';
-        }
+        // Keep timer color constant (not turning red)
+        timerCircle.style.stroke = 'var(--timer-color)';
       }
     }
 };

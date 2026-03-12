@@ -32,8 +32,8 @@ window.saveTokens = function() {
         // Cloud is source of truth when logged in
         if (window.pushToCloud) window.pushToCloud();
     } else {
-        // Offline fallback: save to localStorage
-        localStorage.setItem(STORAGE_KEYS.TOKENS, JSON.stringify(appState.tokens));
+        // Offline fallback: DISABLED - No local tokens for security
+        console.log('[Storage] Save tokens ignored - user not logged in');
     }
     if (window.updateStats) window.updateStats();
 };

@@ -52,10 +52,8 @@ function updateAuthUI(isLoggedIn) {
     const mainApp = document.getElementById('mainApp');
 
     if (isLoggedIn) {
-        // Hide gate, show app
-        if (loginGate) loginGate.style.display = 'none';
-        if (mainApp) mainApp.style.display = 'flex';
-
+        // App is always shown now, no need to toggle main layout
+        
         if (!DOM.btnAuth) return;
         DOM.btnAuth.style.display = 'none';
         DOM.userProfile.style.display = 'flex';
@@ -78,10 +76,8 @@ function updateAuthUI(isLoggedIn) {
         if (DOM.profileView) DOM.profileView.style.display = 'block';
         if (DOM.authTitle) DOM.authTitle.textContent = 'Tài khoản';
     } else {
-        // Show gate, hide app
-        if (loginGate) loginGate.style.display = 'flex';
-        if (mainApp) mainApp.style.display = 'none';
-
+        // App is always shown now
+        
         if (!DOM.btnAuth) return;
         DOM.btnAuth.style.display = 'flex';
         DOM.userProfile.style.display = 'none';

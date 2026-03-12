@@ -462,9 +462,7 @@
 .modal-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.45); /* Darker overlay without blur */
 }
 
 .modal-container {
@@ -478,12 +476,14 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transform: scale(0.95);
-  transition: transform 0.2s ease;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
 .modal[aria-hidden="false"] .modal-container {
-  transform: scale(1);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .modal-lg {
@@ -1056,16 +1056,24 @@ input:checked+.slider:before {
   .header {
     flex-wrap: wrap;
     gap: 12px;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    order: 1;
+  }
+
+  .header-right {
+    order: 2;
+    gap: 8px;
   }
 
   .header-center {
     order: 3;
+    flex-basis: 100%;
     max-width: 100%;
     width: 100%;
-  }
-
-  .header-right {
-    gap: 8px;
+    margin-top: 4px;
   }
 
   .btn-icon {

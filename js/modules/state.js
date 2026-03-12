@@ -8,7 +8,7 @@ const STORAGE_KEYS = {
 
 // Default settings
 const DEFAULT_SETTINGS = {
-    darkMode: false,
+    darkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
     sync: {
         enabled: true,
         url: 'https://reyhwybahpgtgqsofjdc.supabase.co',

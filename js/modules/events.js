@@ -315,9 +315,19 @@ window.setupEventListeners = function() {
 
     // 2. Header & Main Buttons
     bindById('btnAddToken', 'click', () => { switchTab('scan'); openModal('addTokenModal'); });
-    bindById('btnImport', 'click', () => openModal('importModal'));
-    bindById('btnExport', 'click', () => openModal('exportModal'));
-    bindById('btnSettings', 'click', () => openModal('settingsModal'));
+    
+    // Updated Settings/Profile interactions
+    const btnExportProfile = document.getElementById('btnExport');
+    const btnImportProfile = document.getElementById('btnImport');
+    bind(btnExportProfile, 'click', () => { 
+        closeModal('authModal'); 
+        setTimeout(() => openModal('exportModal'), 200); 
+    });
+    bind(btnImportProfile, 'click', () => { 
+        closeModal('authModal'); 
+        setTimeout(() => openModal('importModal'), 200); 
+    });
+
     bind(DOM.darkModeToggle, 'change', toggleTheme);
 
     // 3. Empty State Buttons
