@@ -15,9 +15,38 @@
 </head>
 <body>
   <div id="app">
-  <div id="app">
-    <!-- Main App -->
-    <div id="mainApp" class="main-app">
+    <!-- Login Gate - shown when not authenticated -->
+    <div id="loginGate" class="login-gate">
+      <div class="login-gate-card">
+        <div class="login-gate-logo">
+          <i class="fas fa-shield-halved"></i>
+          <h1>Open2FA</h1>
+          <p>Trình xác thực 2 lớp an toàn</p>
+        </div>
+        <button id="btnGateGoogle" class="btn-google-gate">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" alt="Google">
+          Tiếp tục với Google
+        </button>
+        <div class="auth-divider"><span>hoặc</span></div>
+        <form id="gateAuthForm">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="gateEmail" placeholder="example@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu</label>
+            <input type="password" id="gatePassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" id="btnGateSubmit" style="width:100%;margin-top:8px;">Đăng nhập</button>
+        </form>
+        <p class="auth-switch" style="margin-top:16px;">
+          <span id="gateSwitchText">Chưa có tài khoản? </span><a href="#" id="gateSwitchLink">Đăng ký ngay</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Main App - hidden until authenticated -->
+    <div id="mainApp" class="main-app" style="display:none;">
       <!-- Header -->
       <header class="header">
         <div class="header-left">
@@ -36,17 +65,20 @@
           <button id="btnAddToken" class="btn-icon" title="Thêm token">
             <i class="fas fa-plus"></i>
           </button>
-          <button id="btnImport" class="btn-icon" title="Nhập khẩu">
-            <i class="fas fa-file-import"></i>
-          </button>
-          <button id="btnExport" class="btn-icon" title="Xuất khẩu">
-            <i class="fas fa-file-export"></i>
-          </button>
           <button id="btnSettings" class="btn-icon" title="Cài đặt">
             <i class="fas fa-cog"></i>
           </button>
-          <button id="btnTheme" class="btn-icon" title="Chế độ tối/sáng">
-            <i class="fas fa-moon"></i>
+
+          <div class="user-profile" id="userProfile" style="display: none;">
+            <div class="avatar-wrapper">
+              <button id="btnUser" class="btn-avatar">
+                <span id="userInitial">U</span>
+              </button>
+              <span id="syncStatusDot" class="status-dot-avatar"></span>
+            </div>
+          </div>
+          <button id="btnAuth" class="btn-primary btn-sm" style="margin-left: 8px;">
+            <i class="fas fa-user-circle"></i> Đăng nhập
           </button>
         </div>
       </header>
@@ -104,11 +136,8 @@
       <footer class="status-bar">
         <div class="status-left">
           <span id="tokenCount">0 tokens</span>
-          <span class="status-dot online"></span>
-          <span>Đã đồng bộ</span>
         </div>
         <div class="status-right">
-          <span id="lastBackup">Chưa sao lưu</span>
         </div>
       </footer>
     </div>
@@ -302,7 +331,7 @@
                 <label>Xuất dữ liệu</label>
                 <p>Tải file sao lưu mã hóa</p>
               </div>
-              <button class="btn-secondary btn-sm" id="btnExportSettings">
+              <button class="btn-secondary btn-sm" id="btnExport">
                 <i class="fas fa-download"></i> Xuất
               </button>
             </div>
@@ -311,41 +340,12 @@
                 <label>Nhập dữ liệu</label>
                 <p>Khôi phục từ file sao lưu</p>
               </div>
-              <button class="btn-secondary btn-sm" id="btnImportSettings">
+              <button class="btn-secondary btn-sm" id="btnImport">
                 <i class="fas fa-upload"></i> Nhập
               </button>
             </div>
           </div>
-          <div class="settings-section">
-            <h3>Đồng bộ đám mây (Supabase)</h3>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label>Kích hoạt đồng bộ</label>
-                <p>Đồng bộ thời gian thực giữa các thiết bị</p>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="syncEnabledToggle">
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div id="syncFields" style="display: none; margin-top: 16px;">
-              <div class="form-group">
-                <label>Supabase URL</label>
-                <input type="text" id="supabaseUrl" placeholder="https://xyz.supabase.co">
-              </div>
-              <div class="form-group">
-                <label>Supabase Anon Key</label>
-                <input type="password" id="supabaseKey" placeholder="your-anon-key">
-              </div>
-              <div class="form-group">
-                <label>Sync ID (Dùng chung để đồng bộ)</label>
-                <input type="text" id="syncId" placeholder="Mã bí mật của bạn">
-              </div>
-              <button class="btn-primary w-full" id="btnSaveSync" style="width: 100%;">
-                <i class="fas fa-cloud-upload-alt"></i> Lưu & Kết nối
-              </button>
-            </div>
-          </div>
+
         </div>
         <div class="modal-footer">
           <button class="btn-ghost" data-close="settingsModal">Đóng</button>
@@ -467,6 +467,68 @@
       <i class="fas fa-check"></i> Đã sao chép!
     </div>
   </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="authModal"></div>
+      <div class="modal-container modal-sm">
+        <div class="modal-header">
+          <h2 id="authTitle">Đăng nhập</h2>
+          <button class="modal-close" data-close="authModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="authView">
+            <button id="btnGoogleLogin" class="btn-secondary w-full" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: 1px solid var(--border);">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="Google logo">
+              Tiếp tục với Google
+            </button>
+            
+            <div class="auth-divider">
+              <span>hoặc</span>
+            </div>
+
+            <form id="authForm">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="authEmail" placeholder="example@gmail.com" required>
+              </div>
+              <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="authPassword" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn-primary w-full" id="btnAuthSubmit" style="width: 100%; margin-top: 16px;">
+                Đăng nhập
+              </button>
+            </form>
+            <p class="auth-switch">
+              <span id="authSwitchText">Chưa có tài khoản?</span> <a href="#" id="switchToRegister">Đăng ký ngay</a>
+            </p>
+          </div>
+          <div id="profileView" style="display: none;">
+            <div class="user-info-card">
+              <div class="user-avatar-large" id="userAvatarLarge">U</div>
+              <h3 id="userEmailText">user@example.com</h3>
+              <p class="status-online">Đang trực tuyến</p>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Đồng bộ tự động</label>
+                <p>Tự động lưu lên đám mây</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="autoSyncToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <button class="btn-danger w-full" id="btnSignOut" style="width: 100%; margin-top: 24px;">
+              <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/totp.js"></script>

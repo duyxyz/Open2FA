@@ -46,13 +46,6 @@ window.toggleTheme = function() {
     appState.settings.darkMode = !appState.settings.darkMode;
     saveSettings();
     applyTheme();
-    
-    const icon = document.getElementById('btnTheme').querySelector('i');
-    if (appState.settings.darkMode) {
-      icon.classList.replace('fa-moon', 'fa-sun');
-    } else {
-      icon.classList.replace('fa-sun', 'fa-moon');
-    }
 };
 
 window.switchTab = function(tabName) {
@@ -263,12 +256,8 @@ window.updateBadgeCounts = function() {
     DOM.tokenCount.textContent = `${total} token${total !== 1 ? 's' : ''}`;
 };
 
-window.updateStats = function() {
-    if (appState.settings.lastBackup) {
-      const date = new Date(appState.settings.lastBackup);
-      DOM.lastBackup.textContent = `Sao lưu: ${date.toLocaleDateString('vi-VN')}`;
-    }
-};
+// function window.updateStats removed as per cloud-only requirement
+
 
 let updateInterval;
 window.startTokenUpdate = function() {

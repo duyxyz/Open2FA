@@ -10,15 +10,10 @@ window.loadState = function() {
       }
     }
 
-    // Load tokens
-    const tokensJson = localStorage.getItem(STORAGE_KEYS.TOKENS);
-    if (tokensJson) {
-      try {
-        appState.tokens = JSON.parse(tokensJson);
-      } catch (e) {
-        appState.tokens = [];
-      }
-    }
+    // Load tokens - SKIP for cloud-only data policy
+    // We only load from Supabase now once logged in.
+    appState.tokens = []; 
+
 
     // Load activity
     const activityJson = localStorage.getItem(STORAGE_KEYS.ACTIVITY);
@@ -33,9 +28,14 @@ window.loadState = function() {
 
 // Save state
 window.saveTokens = function() {
-    localStorage.setItem(STORAGE_KEYS.TOKENS, JSON.stringify(appState.tokens));
-    if(window.updateStats) window.updateStats();
-    if(window.pushToCloud) window.pushToCloud();
+    if (appState.currentUser) {
+        // Cloud is source of truth when logged in
+        if (window.pushToCloud) window.pushToCloud();
+    } else {
+        // Offline fallback: save to localStorage
+        localStorage.setItem(STORAGE_KEYS.TOKENS, JSON.stringify(appState.tokens));
+    }
+    if (window.updateStats) window.updateStats();
 };
 
 window.saveSettings = function() {

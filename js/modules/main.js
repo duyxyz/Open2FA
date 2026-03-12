@@ -10,13 +10,11 @@
       setupEventListeners();
       applyTheme();
       
-      // Auto-fill sync fields from settings
+      // Auto-fill sync fields from settings if they exist
       if (appState.settings.sync) {
-        DOM.supabaseUrl.value = appState.settings.sync.url || '';
-        DOM.supabaseKey.value = appState.settings.sync.key || '';
-        DOM.syncId.value = appState.settings.sync.id || '';
-        DOM.syncEnabledToggle.checked = appState.settings.sync.enabled || false;
-        DOM.syncFields.style.display = appState.settings.sync.enabled ? 'block' : 'none';
+        if (DOM.supabaseUrl) DOM.supabaseUrl.value = appState.settings.sync.url || '';
+        if (DOM.supabaseKey) DOM.supabaseKey.value = appState.settings.sync.key || '';
+        if (DOM.autoSyncToggle) DOM.autoSyncToggle.checked = appState.settings.sync.enabled;
       }
 
       // Start the app directly

@@ -1,34 +1,42 @@
 // Export and File Handlers
 window.exportJSON = function() {
-    const data = JSON.stringify(appState.tokens, null, 2);
-    downloadFile(data, 'secureauth-backup.json', 'application/json');
-    closeModal('exportModal');
-    showToast('Đã xuất file JSON', 'success');
+    try {
+        const data = JSON.stringify(appState.tokens, null, 2);
+        downloadFile(data, 'secureauth-backup.json', 'application/json');
+        closeModal('exportModal');
+        showToast('Đã xuất file JSON', 'success');
+    } catch (e) {
+        showToast('Lỗi khi xuất file', 'error');
+    }
 };
 
 window.exportEncrypted = async function() {
     const password = prompt('Nhập mật khẩu để mã hóa:');
     if (!password) return;
 
-    const key = await deriveKey(password);
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const data = JSON.stringify(appState.tokens);
-    const encoded = new TextEncoder().encode(data);
-    
-    const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
-      key,
-      encoded
-    );
+    try {
+        const key = await deriveKey(password);
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const data = JSON.stringify(appState.tokens);
+        const encoded = new TextEncoder().encode(data);
+        
+        const encrypted = await crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
+          key,
+          encoded
+        );
 
-    const result = {
-      iv: Array.from(iv),
-      data: Array.from(new Uint8Array(encrypted))
-    };
+        const result = {
+          iv: Array.from(iv),
+          data: Array.from(new Uint8Array(encrypted))
+        };
 
-    downloadFile(JSON.stringify(result), 'secureauth-backup-encrypted.json', 'application/json');
-    closeModal('exportModal');
-    showToast('Đã xuất file mã hóa', 'success');
+        downloadFile(JSON.stringify(result), 'secureauth-backup-encrypted.json', 'application/json');
+        closeModal('exportModal');
+        showToast('Đã xuất file mã hóa', 'success');
+    } catch (err) {
+        showToast('Lỗi khi xuất file mã hóa', 'error');
+    }
 };
 
 window.downloadFile = function(content, filename, type) {
@@ -44,6 +52,7 @@ window.downloadFile = function(content, filename, type) {
 window.setupImportDropzone = function() {
     const dropzone = document.getElementById('importDropzone');
     const fileInput = document.getElementById('importFile');
+    if (!dropzone || !fileInput) return;
 
     dropzone.addEventListener('click', () => fileInput.click());
     
@@ -68,7 +77,8 @@ window.setupImportDropzone = function() {
       if (file) handleImportFile(file);
     });
 
-    document.getElementById('btnConfirmImport').addEventListener('click', confirmImport);
+    const btnConfirm = document.getElementById('btnConfirmImport');
+    if (btnConfirm) btnConfirm.addEventListener('click', confirmImport);
 };
 
 window.handleImportFile = async function(file) {
@@ -76,11 +86,8 @@ window.handleImportFile = async function(file) {
     reader.onload = async (e) => {
       try {
         const content = e.target.result;
-        
-        // Try to parse as JSON
         const data = JSON.parse(content);
         
-        // Check if it's encrypted
         if (data.iv && data.data) {
           const password = document.getElementById('importPassword').value;
           if (!password) {
@@ -101,13 +108,16 @@ window.handleImportFile = async function(file) {
           throw new Error('Invalid format');
         }
 
-        // Show preview
         const preview = document.getElementById('importPreview');
-        preview.innerHTML = `<strong>Tìm thấy ${appState.importData.length} token:</strong><br>` +
-            appState.importData.slice(0, 5).map(t => `• ${t.name} (${t.account})`).join('<br>') +
-          (appState.importData.length > 5 ? `<br>... và ${appState.importData.length - 5} token khác` : '');
-        preview.classList.add('active');
-        document.getElementById('btnConfirmImport').disabled = false;
+        if (preview) {
+            preview.innerHTML = `<strong>Tìm thấy ${appState.importData.length} token:</strong><br>` +
+                appState.importData.slice(0, 5).map(t => `• ${t.name} (${t.account})`).join('<br>') +
+              (appState.importData.length > 5 ? `<br>... và ${appState.importData.length - 5} token khác` : '');
+            preview.classList.add('active');
+        }
+        
+        const btnConfirm = document.getElementById('btnConfirmImport');
+        if (btnConfirm) btnConfirm.disabled = false;
         
         showToast('Tải file thành công', 'success');
       } catch (err) {
@@ -130,7 +140,6 @@ window.confirmImport = function() {
         appState.tokens = [...appState.importData];
         addedCount = appState.importData.length;
     } else {
-        // Merge tokens
         const existingIds = new Set(appState.tokens.map(t => t.id));
         const newTokens = appState.importData.filter(t => !existingIds.has(t.id));
         appState.tokens = [...appState.tokens, ...newTokens];
@@ -138,27 +147,23 @@ window.confirmImport = function() {
     }
     
     saveTokens();
-    
     appState.settings.lastBackup = Date.now();
     saveSettings();
-    
     closeModal('importModal');
-    renderTokens();
-    
+    renderTokens(true);
     showToast(`Đã nhập hợp lệ ${addedCount} token`, 'success');
     
-    // Reset
     appState.importData = null;
-    document.getElementById('importPreview').classList.remove('active');
-    document.getElementById('btnConfirmImport').disabled = true;
-    document.getElementById('importPassword').value = '';
+    const preview = document.getElementById('importPreview');
+    if (preview) preview.classList.remove('active');
+    const btnConfirm = document.getElementById('btnConfirmImport');
+    if (btnConfirm) btnConfirm.disabled = true;
 };
 
 window.handleKeyboard = function(e) {
-    // Cmd/Ctrl + K for search
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
-      DOM.searchInput.focus();
+      if (DOM.searchInput) DOM.searchInput.focus();
     }
 };
 
@@ -189,8 +194,6 @@ window.handleSaveToken = function() {
     renderTokens(true);
     closeModal('addTokenModal');
     resetTokenForm();
-    
-    saveActivity({ type: 'add', text: `Thêm token: ${name}` });
     showToast(`Đã thêm token ${name}`, 'success');
 };
 
@@ -215,70 +218,12 @@ window.handleUpdateToken = function() {
     saveTokens();
     renderTokens(true);
     closeModal('editTokenModal');
-    saveActivity({ type: 'update', text: `Cập nhật token: ${name}` });
     showToast(`Đã cập nhật token ${name}`, 'success');
-};
-
-window.handleGoogleAuthPaste = function(e) {
-    const val = e.target.value.trim();
-    if (val.startsWith('otpauth-migration://')) {
-        try {
-            const url = new URL(val);
-            const dataBase64 = url.searchParams.get('data');
-            if (dataBase64) {
-                // Decode URL component and replace url-safe characters
-                let b64 = decodeURIComponent(dataBase64).replace(/-/g, '+').replace(/_/g, '/');
-                while (b64.length % 4 !== 0) b64 += '=';
-                
-                const bytes = decodeBase64(b64);
-                const accounts = parseProtobuf(bytes);
-                
-                if (accounts.length > 0) {
-                    const importMode = document.querySelector('input[name="googleImportMode"]:checked')?.value || 'merge';
-                    
-                    if (importMode === 'replace') {
-                        if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ Token cũ và chép đè dữ liệu từ Google Auth sang không?')) {
-                            e.target.value = '';
-                            return;
-                        }
-                        appState.tokens = []; // Clear for replace mode
-                    }
-
-                    accounts.forEach(acc => {
-                        const token = {
-                            id: generateId(),
-                            name: acc.name || acc.issuer || 'Google Auth Import',
-                            account: acc.account || acc.name || '',
-                            secret: acc.secretBase32,
-                            category: 'other',
-                            iconUrl: '',
-                            createdAt: Date.now()
-                        };
-                        appState.tokens.push(token);
-                    });
-                    
-                    saveTokens();
-                    closeModal('addTokenModal');
-                    e.target.value = '';
-                    
-                    renderTokens(true);
-                    saveActivity({ type: 'add', text: `Nhập ${accounts.length} token từ Google Auth` });
-                    showToast(`Đã thêm ${accounts.length} token từ Google Auth`, 'success');
-                } else {
-                    showToast('Không tìm thấy token hợp lệ', 'error');
-                }
-            }
-        } catch (err) {
-            console.error('Lỗi khi giải mã Google Auth:', err);
-            showToast('URI không đúng định dạng', 'error');
-        }
-    }
 };
 
 window.handleDeleteToken = function() {
     const id = document.getElementById('editTokenId').value;
     const token = appState.tokens.find(t => t.id === id);
-    
     if (!token) return;
 
     if (confirm(`Bạn có chắc muốn xóa token "${token.name}"?`)) {
@@ -286,138 +231,157 @@ window.handleDeleteToken = function() {
       saveTokens();
       renderTokens(true);
       closeModal('editTokenModal');
-      saveActivity({ type: 'delete', text: `Xóa token: ${token.name}` });
       showToast(`Đã xóa token ${token.name}`, 'success');
     }
 };
 
 window.handleSaveSync = async function() {
-    const url = DOM.supabaseUrl.value.trim();
-    const key = DOM.supabaseKey.value.trim();
-    const id = DOM.syncId.value.trim();
+    const url = DOM.supabaseUrl?.value.trim();
+    const key = DOM.supabaseKey?.value.trim();
 
-    if (!url || !key || !id) {
-        showToast('Vui lòng điền đầy đủ các trường đồng bộ', 'error');
+    if (!url || !key) {
+        showToast('Vui lòng điền đầy đủ các trường cấu hình', 'error');
         return;
     }
 
     appState.settings.sync.url = url;
     appState.settings.sync.key = key;
-    appState.settings.sync.id = id;
-    appState.settings.sync.enabled = true;
-    DOM.syncEnabledToggle.checked = true;
-
     saveSettings();
-    
-    if (window.initSync) {
-        await window.initSync();
-        // Option to push local data immediately if cloud is empty
-        await window.pushToCloud();
-    }
+    showToast('Đã lưu cấu hình Supabase', 'success');
+    if (DOM.syncFields) DOM.syncFields.style.display = 'none';
+    if (window.initSync) await window.initSync();
 };
 
 window.setupEventListeners = function() {
-    // Google Auth Import logic
-    document.getElementById('otpauthUri').addEventListener('input', handleGoogleAuthPaste);
+    const bind = (el, event, fn) => {
+        if (el) el.addEventListener(event, fn);
+    };
 
-    // Header buttons
-    document.getElementById('btnAddToken').addEventListener('click', () => {
-        switchTab('scan');
-        openModal('addTokenModal');
-    });
-    document.getElementById('btnImport').addEventListener('click', () => openModal('importModal'));
-    document.getElementById('btnExport').addEventListener('click', () => openModal('exportModal'));
-    document.getElementById('btnSettings').addEventListener('click', () => openModal('settingsModal'));
-    document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+    const bindById = (id, event, fn) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(event, fn);
+    };
 
-    // Empty state buttons
-    document.getElementById('btnEmptyAdd').addEventListener('click', () => openModal('addTokenModal'));
-    document.getElementById('btnEmptyImport').addEventListener('click', () => openModal('importModal'));
-
-    // Search
-    DOM.searchInput.addEventListener('input', (e) => {
-      appState.searchQuery = e.target.value;
-      renderTokens();
+    // 0. Login Gate
+    bindById('btnGateGoogle', 'click', () => {
+        if (window.signInWithGoogle) window.signInWithGoogle();
     });
 
-    // Categories
-    document.querySelectorAll('.category').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.category').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        appState.currentCategory = btn.dataset.category;
+    bindById('gateAuthForm', 'submit', (e) => {
+        if (window.handleAuthAction) window.handleAuthAction(e, 'gate');
+    });
+
+    bindById('gateSwitchLink', 'click', (e) => {
+        e.preventDefault();
+        appState.isRegisterMode = !appState.isRegisterMode;
+        const text = document.getElementById('gateSwitchText');
+        const link = document.getElementById('gateSwitchLink');
+        const btn = document.getElementById('btnGateSubmit');
+        
+        if (appState.isRegisterMode) {
+            text.textContent = 'Đã có tài khoản? ';
+            link.textContent = 'Đăng nhập';
+            btn.textContent = 'Đăng ký';
+        } else {
+            text.textContent = 'Chưa có tài khoản? ';
+            link.textContent = 'Đăng ký ngay';
+            btn.textContent = 'Đăng nhập';
+        }
+    });
+
+    // 1. Auth & Profile
+    bind(DOM.btnAuth, 'click', () => {
+        appState.isRegisterMode = false;
+        if (DOM.authTitle) DOM.authTitle.textContent = 'Đăng nhập';
+        if (DOM.btnAuthSubmit) DOM.btnAuthSubmit.textContent = 'Đăng nhập';
+        if (DOM.authView) DOM.authView.style.display = 'block';
+        if (DOM.profileView) DOM.profileView.style.display = 'none';
+        openModal('authModal');
+    });
+
+    bind(DOM.btnUser, 'click', () => openModal('authModal'));
+    bind(DOM.btnGoogleLogin, 'click', () => window.signInWithGoogle());
+
+    bind(DOM.switchToRegister, 'click', (e) => {
+        e.preventDefault();
+        appState.isRegisterMode = !appState.isRegisterMode;
+        if (DOM.authTitle) DOM.authTitle.textContent = appState.isRegisterMode ? 'Đăng ký' : 'Đăng nhập';
+        if (DOM.btnAuthSubmit) DOM.btnAuthSubmit.textContent = appState.isRegisterMode ? 'Đăng ký' : 'Đăng nhập';
+        if (DOM.switchToRegister) DOM.switchToRegister.textContent = appState.isRegisterMode ? 'Đăng nhập ngay' : 'Đăng ký ngay';
+        if (DOM.authSwitchText) DOM.authSwitchText.textContent = appState.isRegisterMode ? 'Đã có tài khoản? ' : 'Chưa có tài khoản? ';
+    });
+
+    if (DOM.authForm) DOM.authForm.addEventListener('submit', (e) => window.handleAuthAction(e));
+    bind(DOM.btnSignOut, 'click', () => window.handleSignOut());
+    
+    bind(DOM.autoSyncToggle, 'change', (e) => {
+        appState.settings.sync.enabled = e.target.checked;
+        saveSettings();
+    });
+
+    bind(DOM.btnEditSyncConfig, 'click', () => {
+        if (DOM.syncFields) DOM.syncFields.style.display = DOM.syncFields.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // 2. Header & Main Buttons
+    bindById('btnAddToken', 'click', () => { switchTab('scan'); openModal('addTokenModal'); });
+    bindById('btnImport', 'click', () => openModal('importModal'));
+    bindById('btnExport', 'click', () => openModal('exportModal'));
+    bindById('btnSettings', 'click', () => openModal('settingsModal'));
+    bind(DOM.darkModeToggle, 'change', toggleTheme);
+
+    // 3. Empty State Buttons
+    bindById('btnEmptyAdd', 'click', () => openModal('addTokenModal'));
+    bindById('btnEmptyImport', 'click', () => openModal('importModal'));
+
+    // 4. Modal Actions
+    bindById('btnSaveToken', 'click', handleSaveToken);
+    bindById('btnUpdateToken', 'click', handleUpdateToken);
+    bindById('btnDeleteToken', 'click', handleDeleteToken);
+    bindById('btnExportJson', 'click', exportJSON);
+    bindById('btnExportEncrypted', 'click', exportEncrypted);
+    bindById('btnSaveSync', 'click', handleSaveSync);
+    bindById('btnGenerateSecret', 'click', () => {
+        const secret = TOTP.generateSecret(16);
+        const input = document.getElementById('tokenSecret');
+        if (input) input.value = secret;
+    });
+
+    // 5. Search & Filters
+    if (DOM.searchInput) DOM.searchInput.addEventListener('input', (e) => {
+        appState.searchQuery = e.target.value;
         renderTokens();
-      });
     });
 
-    // Modal tabs
+    document.querySelectorAll('.category').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.category').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            appState.currentCategory = btn.dataset.category;
+            renderTokens();
+        });
+    });
+
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        switchTab(tab.dataset.tab);
-      });
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
 
-    // Modal close buttons
+    // 6. Modal Close Generic
     document.querySelectorAll('[data-close]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const modalId = btn.dataset.close;
-        closeModal(modalId);
-      });
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeModal(btn.dataset.close);
+        });
     });
 
-    // Modal overlays
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', () => {
-        const modal = overlay.closest('.modal');
-        if (modal) closeModal(modal.id);
-      });
+        overlay.addEventListener('click', () => {
+            const modal = overlay.closest('.modal');
+            if (modal) closeModal(modal.id);
+        });
     });
 
-    // Generate secret
-    document.getElementById('btnGenerateSecret').addEventListener('click', () => {
-      const secret = TOTP.generateSecret(16);
-      document.getElementById('tokenSecret').value = secret;
-    });
-
-    // Save token
-    document.getElementById('btnSaveToken').addEventListener('click', handleSaveToken);
-
-    // Edit token
-    document.getElementById('btnUpdateToken').addEventListener('click', handleUpdateToken);
-    document.getElementById('btnDeleteToken').addEventListener('click', handleDeleteToken);
-
-    // Settings
-    document.getElementById('autoLockTime').addEventListener('change', (e) => {
-      appState.settings.autoLock = parseInt(e.target.value);
-      saveSettings();
-    });
-    document.getElementById('darkModeToggle').addEventListener('change', (e) => {
-      appState.settings.darkMode = e.target.checked;
-      saveSettings();
-      applyTheme();
-    });
-    document.getElementById('copyEffectsToggle').addEventListener('change', (e) => {
-      appState.settings.copyEffects = e.target.checked;
-      saveSettings();
-    });
-
-    // Sync
-    DOM.syncEnabledToggle.addEventListener('change', (e) => {
-      appState.settings.sync.enabled = e.target.checked;
-      DOM.syncFields.style.display = e.target.checked ? 'block' : 'none';
-      saveSettings();
-      if (!e.target.checked && window.initSync) window.initSync();
-    });
-
-    DOM.btnSaveSync.addEventListener('click', handleSaveSync);
-
-    // Export
-    document.getElementById('btnExportJson').addEventListener('click', exportJSON);
-    document.getElementById('btnExportEncrypted').addEventListener('click', exportEncrypted);
-
-    // Import
+    // 7. Global listeners
     setupImportDropzone();
-
-    // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboard);
 };
