@@ -171,7 +171,6 @@ window.handleSaveToken = function() {
     const name = document.getElementById('tokenName').value.trim();
     const account = document.getElementById('tokenAccount').value.trim();
     const secret = document.getElementById('tokenSecret').value.trim().toUpperCase();
-    const category = document.getElementById('tokenCategory').value;
     const iconUrl = document.getElementById('tokenIcon') ? document.getElementById('tokenIcon').value.trim() : '';
 
     if (!name || !account || !secret) {
@@ -184,7 +183,6 @@ window.handleSaveToken = function() {
       name,
       account,
       secret,
-      category,
       iconUrl: iconUrl || '',
       createdAt: Date.now()
     };
@@ -201,7 +199,6 @@ window.handleUpdateToken = function() {
     const id = document.getElementById('editTokenId').value;
     const name = document.getElementById('editTokenName').value.trim();
     const account = document.getElementById('editTokenAccount').value.trim();
-    const category = document.getElementById('editTokenCategory').value;
     const iconUrl = document.getElementById('editTokenIcon') ? document.getElementById('editTokenIcon').value.trim() : '';
 
     const index = appState.tokens.findIndex(t => t.id === id);
@@ -211,7 +208,6 @@ window.handleUpdateToken = function() {
       ...appState.tokens[index],
       name,
       account,
-      category,
       iconUrl: iconUrl || ''
     };
 
@@ -345,15 +341,6 @@ window.setupEventListeners = function() {
     if (DOM.searchInput) DOM.searchInput.addEventListener('input', (e) => {
         appState.searchQuery = e.target.value;
         renderTokens();
-    });
-
-    document.querySelectorAll('.category').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.category').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            appState.currentCategory = btn.dataset.category;
-            renderTokens();
-        });
     });
 
     document.querySelectorAll('.tab').forEach(tab => {

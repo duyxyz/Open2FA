@@ -117,10 +117,12 @@
   display: none;
 }
 
-.token-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
+@media (hover: hover) and (pointer: fine) {
+  .token-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
 }
 
 .token-card-header {
@@ -274,12 +276,14 @@
   justify-content: center;
 }
 
-.edit-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--on-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+  .edit-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 /* Empty State */
@@ -344,10 +348,12 @@
   gap: 8px;
 }
 
-.btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .btn-secondary {
@@ -366,9 +372,11 @@
   gap: 8px;
 }
 
-.btn-secondary:hover {
-  background: var(--bg-hover);
-  border-color: var(--text-tertiary);
+@media (hover: hover) and (pointer: fine) {
+  .btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-tertiary);
+  }
 }
 
 .btn-ghost {
@@ -383,9 +391,11 @@
   transition: var(--transition);
 }
 
-.btn-ghost:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
 }
 
 .btn-danger {
@@ -404,8 +414,10 @@
   gap: 8px;
 }
 
-.btn-danger:hover {
-  background: var(--danger-hover);
+@media (hover: hover) and (pointer: fine) {
+  .btn-danger:hover {
+    background: var(--danger-hover);
+  }
 }
 
 .btn-link {
@@ -417,8 +429,10 @@
   font-weight: 500;
 }
 
-.btn-link:hover {
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .btn-link:hover {
+    text-decoration: underline;
+  }
 }
 
 .btn-sm {
@@ -519,9 +533,11 @@
   transition: var(--transition);
 }
 
-.modal-close:hover {
-  background: var(--danger);
-  color: white;
+@media (hover: hover) and (pointer: fine) {
+  .modal-close:hover {
+    background: var(--danger);
+    color: white;
+  }
 }
 
 .modal-body {
@@ -561,8 +577,10 @@
   transition: var(--transition);
 }
 
-.tab:hover {
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    color: var(--text-primary);
+  }
 }
 
 .tab.active {
@@ -658,10 +676,12 @@
   transition: var(--transition);
 }
 
-.btn-generate-secret:hover {
-  background: var(--primary);
-  color: var(--on-primary);
-  border-color: var(--primary);
+@media (hover: hover) and (pointer: fine) {
+  .btn-generate-secret:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+  }
 }
 
 /* QR Scanner */
@@ -846,9 +866,11 @@ input:checked+.slider:before {
   text-align: left;
 }
 
-.export-option:hover {
-  border-color: var(--primary);
-  background: var(--bg-primary);
+@media (hover: hover) and (pointer: fine) {
+  .export-option:hover {
+    border-color: var(--primary);
+    background: var(--bg-primary);
+  }
 }
 
 .export-option i {
@@ -879,10 +901,12 @@ input:checked+.slider:before {
   cursor: pointer;
 }
 
-.import-dropzone:hover,
-.import-dropzone.dragover {
-  border-color: var(--primary);
-  background: var(--primary-light);
+@media (hover: hover) and (pointer: fine) {
+  .import-dropzone:hover,
+  .import-dropzone.dragover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
 }
 
 .import-dropzone i {

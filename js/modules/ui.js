@@ -69,7 +69,6 @@ window.resetTokenForm = function() {
     document.getElementById('tokenAccount').value = '';
     document.getElementById('tokenSecret').value = '';
     document.getElementById('tokenIcon').value = '';
-    document.getElementById('tokenCategory').value = 'other';
 };
 
 window.generateId = function() {
@@ -84,7 +83,6 @@ window.renderTokens = function(force = false) {
     if (totalTokens === 0) {
         DOM.tokenGrid.innerHTML = '';
         DOM.emptyState.classList.add('active');
-        updateBadgeCounts();
         return;
     }
 
@@ -107,33 +105,29 @@ window.renderTokens = function(force = false) {
             card.style.display = 'none';
         }
     });
-    
-    updateBadgeCounts();
 };
 
 window.filterTokens = function(tokens) {
     return tokens.filter(token => {
-      const matchesCategory = appState.currentCategory === 'all' || token.category === appState.currentCategory;
       const matchesSearch = !appState.searchQuery || 
         token.name.toLowerCase().includes(appState.searchQuery.toLowerCase()) ||
         token.account.toLowerCase().includes(appState.searchQuery.toLowerCase()) ||
         (token.issuer && token.issuer.toLowerCase().includes(appState.searchQuery.toLowerCase()));
       
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     });
 };
 
 window.createTokenCard = function(token, index) {
-    const category = token.category || 'other';
     const firstChar = token.name.charAt(0).toUpperCase();
     const iconContent = token.iconUrl 
-      ? `<img src="${token.iconUrl}" alt="${token.name}" class="token-icon-img" onerror="this.parentElement.innerHTML='${firstChar}';this.parentElement.classList.add('${category}')">`
-      : `<span class="${category}">${firstChar}</span>`;
+      ? `<img src="${token.iconUrl}" alt="${token.name}" class="token-icon-img" onerror="this.parentElement.innerHTML='${firstChar}'">`
+      : `<span>${firstChar}</span>`;
     
     return `
       <div class="token-card" data-id="${token.id}" draggable="true" style="animation-delay: ${index * 0.05}s">
         <div class="token-card-header">
-          <div class="token-icon ${token.iconUrl ? '' : category}">${iconContent}</div>
+          <div class="token-icon">${iconContent}</div>
           <div class="token-info">
             <div class="token-name">${token.name}</div>
             <div class="token-account">${token.account}</div>
@@ -244,15 +238,9 @@ window.openEditModal = function(id) {
     document.getElementById('editTokenId').value = token.id;
     document.getElementById('editTokenName').value = token.name;
     document.getElementById('editTokenAccount').value = token.account;
-    document.getElementById('editTokenCategory').value = token.category || 'other';
     document.getElementById('editTokenIcon').value = token.iconUrl || '';
 
     openModal('editTokenModal');
-};
-
-window.updateBadgeCounts = function() {
-    const total = appState.tokens.length;
-    DOM.badgeAll.textContent = total;
 };
 
 // function window.updateStats removed as per cloud-only requirement

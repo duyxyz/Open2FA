@@ -16,20 +16,10 @@ const DEFAULT_SETTINGS = {
     }
 };
 
-// Category colors
-const CATEGORY_COLORS = {
-    social: 'social',
-    finance: 'finance',
-    work: 'work',
-    gaming: 'gaming',
-    other: 'other'
-};
-
 // Global App State
 window.appState = {
     tokens: [],
     settings: { ...DEFAULT_SETTINGS },
-    currentCategory: 'all',
     searchQuery: '',
     editingToken: null,
     importData: null,
@@ -47,7 +37,6 @@ window.cacheDOMElements = function() {
     DOM.searchInput = document.getElementById('searchInput');
 
 
-    DOM.badgeAll = document.getElementById('badgeAll');
     DOM.toastContainer = document.getElementById('toastContainer');
     DOM.copyFeedback = document.getElementById('copyFeedback');
     DOM.syncStatusDot = document.getElementById('syncStatusDot');

@@ -83,35 +83,6 @@
         </div>
       </header>
 
-      <!-- Categories -->
-      <nav class="categories">
-        <button class="category active" data-category="all">
-          <i class="fas fa-layer-group"></i>
-          <span>Tất cả</span>
-          <span class="badge" id="badgeAll">0</span>
-        </button>
-        <button class="category" data-category="social">
-          <i class="fas fa-users"></i>
-          <span>Mạng xã hội</span>
-        </button>
-        <button class="category" data-category="finance">
-          <i class="fas fa-university"></i>
-          <span>Tài chính</span>
-        </button>
-        <button class="category" data-category="work">
-          <i class="fas fa-briefcase"></i>
-          <span>Công việc</span>
-        </button>
-        <button class="category" data-category="gaming">
-          <i class="fas fa-gamepad"></i>
-          <span>Game</span>
-        </button>
-        <button class="category" data-category="other">
-          <i class="fas fa-ellipsis-h"></i>
-          <span>Khác</span>
-        </button>
-      </nav>
-
       <!-- Token Grid -->
       <main class="content">
         <div id="tokenGrid" class="token-grid"></div>
@@ -190,21 +161,10 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="tokenCategory">Danh mục</label>
-                <select id="tokenCategory">
-                  <option value="social">Mạng xã hội</option>
-                  <option value="finance">Tài chính</option>
-                  <option value="work">Công việc</option>
-                  <option value="gaming">Game</option>
-                  <option value="other" selected>Khác</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="tokenIcon">Icon (URL ảnh)</label>
+                <label>Icon URL (không bắt buộc)</label>
                 <input type="url" id="tokenIcon" placeholder="https://example.com/icon.png">
-                <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
               </div>
+              <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
             </form>
           </div>
         </div>
@@ -239,21 +199,10 @@
               <input type="text" id="editTokenAccount" required>
             </div>
             <div class="form-group">
-              <label for="editTokenCategory">Danh mục</label>
-              <select id="editTokenCategory">
-                <option value="social">Mạng xã hội</option>
-                <option value="finance">Tài chính</option>
-                <option value="work">Công việc</option>
-                <option value="gaming">Game</option>
-                <option value="other">Khác</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="editTokenIcon">Icon (URL ảnh)</label>
+              <label>Icon URL (không bắt buộc)</label>
               <input type="url" id="editTokenIcon" placeholder="https://example.com/icon.png">
-              <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
             </div>
+            <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
           </form>
         </div>
         <div class="modal-footer">
