@@ -164,7 +164,12 @@ window.createTokenCard = function(token, index) {
         <div class="token-card-body">
           <div class="token-otp-container">
             <div class="token-otp" id="otp-${token.id}">------</div>
-            <div class="token-timer pizza-timer" id="timer-${token.id}"></div>
+            <div class="token-timer pizza-timer">
+              <svg viewBox="0 0 32 32">
+                <circle class="pizza-bg" cx="16" cy="16" r="16"></circle>
+                <circle class="pizza-slice" id="timer-${token.id}" cx="16" cy="16" r="8" stroke-width="16"></circle>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -308,10 +313,17 @@ window.updateTokens = async function() {
       }
 
       if (timerCircle) {
-        const angle = (percentage / 100) * 360;
-        const color = timeRemaining <= 5 ? 'var(--danger)' : '#374151';
+        // Circumference for r=8 is 2 * PI * 8 = 50.265
+        const circumference = 50.265;
+        const offset = (percentage / 100) * circumference;
+        timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
         
-        timerCircle.style.background = `conic-gradient(${color} ${angle}deg, var(--bg-tertiary) 0deg)`;
+        // Change color when less than 5 seconds
+        if (timeRemaining <= 5) {
+          timerCircle.style.stroke = 'var(--danger)';
+        } else {
+          timerCircle.style.stroke = '#374151';
+        }
       }
     }
 };
