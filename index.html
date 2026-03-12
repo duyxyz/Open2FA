@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open2FA - Trình xác thực mã OTP an toàn</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Lock Screen -->
+    <div id="lockScreen" class="lock-screen" aria-hidden="false">
+      <div class="lock-container">
+        <div class="lock-icon">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <h1>OpenOTP</h1>
+        <p class="lock-subtitle">Nhập mật khẩu để mở khóa</p>
+        <form id="unlockForm" class="lock-form">
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="unlockPassword" placeholder="Mật khẩu" required>
+            <button type="button" class="toggle-password" aria-label="Hiện/ẩn mật khẩu">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-unlock"></i> Mở khóa
+          </button>
+        </form>
+        <div class="lock-footer">
+          <button id="btnSetupPassword" class="btn-link">Thiết lập mật khẩu mới</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="main-app" aria-hidden="true">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">
+            <i class="fas fa-shield-halved"></i>
+            <span>Open2FA</span>
+          </div>
+        </div>
+        <div class="header-center">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm tài khoản...">
+            <kbd>⌘K</kbd>
+          </div>
+        </div>
+        <div class="header-right">
+          <button id="btnAddToken" class="btn-icon" title="Thêm token">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button id="btnImport" class="btn-icon" title="Nhập khẩu">
+            <i class="fas fa-file-import"></i>
+          </button>
+          <button id="btnExport" class="btn-icon" title="Xuất khẩu">
+            <i class="fas fa-file-export"></i>
+          </button>
+          <button id="btnSettings" class="btn-icon" title="Cài đặt">
+            <i class="fas fa-cog"></i>
+          </button>
+          <button id="btnTheme" class="btn-icon" title="Chế độ tối/sáng">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Categories -->
+      <nav class="categories">
+        <button class="category active" data-category="all">
+          <i class="fas fa-layer-group"></i>
+          <span>Tất cả</span>
+          <span class="badge" id="badgeAll">0</span>
+        </button>
+        <button class="category" data-category="social">
+          <i class="fas fa-users"></i>
+          <span>Mạng xã hội</span>
+        </button>
+        <button class="category" data-category="finance">
+          <i class="fas fa-university"></i>
+          <span>Tài chính</span>
+        </button>
+        <button class="category" data-category="work">
+          <i class="fas fa-briefcase"></i>
+          <span>Công việc</span>
+        </button>
+        <button class="category" data-category="gaming">
+          <i class="fas fa-gamepad"></i>
+          <span>Game</span>
+        </button>
+        <button class="category" data-category="other">
+          <i class="fas fa-ellipsis-h"></i>
+          <span>Khác</span>
+        </button>
+      </nav>
+
+      <!-- Token Grid -->
+      <main class="content">
+        <div id="tokenGrid" class="token-grid"></div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+          <h3>Chưa có token nào</h3>
+          <p>Thêm token đầu tiên của bạn bằng cách quét mã QR hoặc nhập thủ công</p>
+          <div class="empty-actions">
+            <button id="btnEmptyAdd" class="btn-primary">
+              <i class="fas fa-plus"></i> Thêm token
+            </button>
+            <button id="btnEmptyImport" class="btn-secondary">
+              <i class="fas fa-file-import"></i> Nhập khẩu
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Status Bar -->
+      <footer class="status-bar">
+        <div class="status-left">
+          <span id="tokenCount">0 tokens</span>
+          <span class="status-dot online"></span>
+          <span>Đã đồng bộ</span>
+        </div>
+        <div class="status-right">
+          <span id="lastBackup">Chưa sao lưu</span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Token Modal -->
+    <div id="addTokenModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="addTokenModal"></div>
+      <div class="modal-container modal-lg">
+        <div class="modal-header">
+          <h2><i class="fas fa-link"></i> Thêm token từ Google Auth</h2>
+          <button class="modal-close" data-close="addTokenModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="tabs">
+            <button class="tab active" data-tab="scan">Google Auth</button>
+            <button class="tab" data-tab="manual">Nhập thủ công</button>
+          </div>
+          <div class="tab-content active" id="tabScan">
+            <div class="qr-scanner">
+              <div class="form-group" style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                <label style="margin-bottom: 0; white-space: nowrap;">Chế độ nhập:</label>
+                <div style="display: flex; gap: 16px;">
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); font-size: 14px; font-weight: normal; margin-bottom: 0; white-space: nowrap;">
+                    <input type="radio" name="googleImportMode" value="merge" checked> Thêm mới
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); font-size: 14px; font-weight: normal; margin-bottom: 0; white-space: nowrap;">
+                    <input type="radio" name="googleImportMode" value="replace"> Thay thế
+                  </label>
+                </div>
+              </div>
+              <div class="qr-input-wrapper">
+                <label>Dán URI otpauth-migration:</label>
+                <textarea id="otpauthUri" placeholder="otpauth-migration://offline?data=..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tabManual">
+            <form id="manualTokenForm">
+              <div class="form-group">
+                <label for="tokenName">Tên dịch vụ <span class="required">*</span></label>
+                <input type="text" id="tokenName" placeholder="Google, GitHub, Facebook..." required>
+              </div>
+              <div class="form-group">
+                <label for="tokenAccount">Tài khoản <span class="required">*</span></label>
+                <input type="text" id="tokenAccount" placeholder="email@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="tokenSecret">Secret Key <span class="required">*</span></label>
+                <div class="input-with-icon">
+                  <input type="text" id="tokenSecret" placeholder="JBSWY3DPEHPK3PXP" required>
+                  <button type="button" class="btn-generate-secret" id="btnGenerateSecret">
+                    <i class="fas fa-dice"></i> Tạo ngẫu nhiên
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="tokenCategory">Danh mục</label>
+                <select id="tokenCategory">
+                  <option value="social">Mạng xã hội</option>
+                  <option value="finance">Tài chính</option>
+                  <option value="work">Công việc</option>
+                  <option value="gaming">Game</option>
+                  <option value="other" selected>Khác</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="tokenIcon">Icon (URL ảnh)</label>
+                <input type="url" id="tokenIcon" placeholder="https://example.com/icon.png">
+                <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" data-close="addTokenModal">Hủy</button>
+          <button class="btn-primary" id="btnSaveToken">
+            <i class="fas fa-save"></i> Lưu token
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Token Modal -->
+    <div id="editTokenModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="editTokenModal"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2><i class="fas fa-edit"></i> Chỉnh sửa token</h2>
+          <button class="modal-close" data-close="editTokenModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editTokenForm">
+            <input type="hidden" id="editTokenId">
+            <div class="form-group">
+              <label for="editTokenName">Tên dịch vụ</label>
+              <input type="text" id="editTokenName" required>
+            </div>
+            <div class="form-group">
+              <label for="editTokenAccount">Tài khoản</label>
+              <input type="text" id="editTokenAccount" required>
+            </div>
+            <div class="form-group">
+              <label for="editTokenCategory">Danh mục</label>
+              <select id="editTokenCategory">
+                <option value="social">Mạng xã hội</option>
+                <option value="finance">Tài chính</option>
+                <option value="work">Công việc</option>
+                <option value="gaming">Game</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="editTokenIcon">Icon (URL ảnh)</label>
+              <input type="url" id="editTokenIcon" placeholder="https://example.com/icon.png">
+              <small class="form-hint">Để trống sẽ sử dụng ký tự đầu tiên</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-danger" id="btnDeleteToken">
+            <i class="fas fa-trash"></i> Xóa
+          </button>
+          <button class="btn-primary" id="btnUpdateToken">
+            <i class="fas fa-save"></i> Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="settingsModal"></div>
+      <div class="modal-container modal-md">
+        <div class="modal-header">
+          <h2><i class="fas fa-cog"></i> Cài đặt</h2>
+          <button class="modal-close" data-close="settingsModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-section">
+            <h3>Bảo mật</h3>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Mật khẩu bảo vệ</label>
+                <p>Đặt mật khẩu để mở ứng dụng</p>
+              </div>
+              <button class="btn-secondary btn-sm" id="btnSetPassword">
+                <i class="fas fa-key"></i> Đặt mật khẩu
+              </button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Tự động khóa</label>
+                <p>Khóa sau khi không hoạt động</p>
+              </div>
+              <select id="autoLockTime" class="select-sm">
+                <option value="0">Không</option>
+                <option value="1">1 phút</option>
+                <option value="5" selected>5 phút</option>
+                <option value="15">15 phút</option>
+                <option value="30">30 phút</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h3>Giao diện</h3>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Chế độ tối</label>
+                <p>Sử dụng giao diện tối</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Hiệu ứng hoạt động</label>
+                <p>Hiển thị hiệu ứng khi sao chép</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="copyEffectsToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h3>Sao lưu & Khôi phục</h3>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Xuất dữ liệu</label>
+                <p>Tải file sao lưu mã hóa</p>
+              </div>
+              <button class="btn-secondary btn-sm" id="btnExportSettings">
+                <i class="fas fa-download"></i> Xuất
+              </button>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label>Nhập dữ liệu</label>
+                <p>Khôi phục từ file sao lưu</p>
+              </div>
+              <button class="btn-secondary btn-sm" id="btnImportSettings">
+                <i class="fas fa-upload"></i> Nhập
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" data-close="settingsModal">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Setup Modal -->
+    <div id="passwordModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="passwordModal"></div>
+      <div class="modal-container modal-sm">
+        <div class="modal-header">
+          <h2><i class="fas fa-key"></i> Thiết lập mật khẩu</h2>
+          <button class="modal-close" data-close="passwordModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="passwordForm">
+            <div class="form-group">
+              <label for="newPassword">Mật khẩu mới</label>
+              <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="newPassword" placeholder="Nhập mật khẩu" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Xác nhận mật khẩu</label>
+              <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" data-close="passwordModal">Hủy</button>
+          <button class="btn-primary" id="btnSavePassword">
+            <i class="fas fa-save"></i> Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="exportModal"></div>
+      <div class="modal-container modal-md">
+        <div class="modal-header">
+          <h2><i class="fas fa-file-export"></i> Xuất dữ liệu</h2>
+          <button class="modal-close" data-close="exportModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="export-options">
+            <button class="export-option" id="btnExportJson">
+              <i class="fas fa-file-code"></i>
+              <div class="export-option-info">
+                <h4>JSON</h4>
+                <p>Xuất file JSON không mã hóa</p>
+              </div>
+            </button>
+            <button class="export-option" id="btnExportEncrypted">
+              <i class="fas fa-file-contract"></i>
+              <div class="export-option-info">
+                <h4>Mã hóa (AES-256)</h4>
+                <p>Xuất file có mật khẩu bảo vệ</p>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" data-close="exportModal">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="importModal"></div>
+      <div class="modal-container modal-md">
+        <div class="modal-header">
+          <h2><i class="fas fa-file-import"></i> Nhập dữ liệu</h2>
+          <button class="modal-close" data-close="importModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="import-dropzone" id="importDropzone">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Kéo thả file vào đây hoặc <label for="importFile" class="btn-link">chọn file</label></p>
+            <input type="file" id="importFile" accept=".json,.txt" hidden>
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu giải mã (nếu file mã hóa)</label>
+            <input type="password" id="importPassword" placeholder="Nhập mật khẩu">
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+            <label style="margin-bottom: 0; white-space: nowrap;">Chế độ nhập:</label>
+            <div style="display: flex; gap: 16px;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); font-size: 14px; font-weight: normal; margin-bottom: 0; white-space: nowrap;">
+                <input type="radio" name="importMode" value="merge" checked> Thêm mới
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); font-size: 14px; font-weight: normal; margin-bottom: 0; white-space: nowrap;">
+                <input type="radio" name="importMode" value="replace"> Thay thế
+              </label>
+            </div>
+          </div>
+          <div class="import-preview" id="importPreview"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" data-close="importModal">Hủy</button>
+          <button class="btn-primary" id="btnConfirmImport" disabled>
+            <i class="fas fa-file-import"></i> Nhập
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Token Detail Modal -->
+    <div id="tokenDetailModal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-close="tokenDetailModal"></div>
+      <div class="modal-container modal-sm">
+        <div class="modal-header">
+          <h2 id="detailTitle">Chi tiết token</h2>
+          <button class="modal-close" data-close="tokenDetailModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-qr" id="detailQr"></div>
+          <div class="detail-info">
+            <p><strong>Dịch vụ:</strong> <span id="detailService"></span></p>
+            <p><strong>Tài khoản:</strong> <span id="detailAccount"></span></p>
+            <p><strong>Secret:</strong> <code id="detailSecret"></code></p>
+            <p><strong>Thêm:</strong> <span id="detailCreated"></span></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="btnCopySecret">
+            <i class="fas fa-copy"></i> Copy Secret
+          </button>
+          <button class="btn-ghost" data-close="tokenDetailModal">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Copy Feedback -->
+    <div id="copyFeedback" class="copy-feedback">
+      <i class="fas fa-check"></i> Đã sao chép!
+    </div>
+  </div>
+
+  <script src="js/totp.js"></script>
+  <script src="js/modules/state.js"></script>
+  <script src="js/modules/storage.js"></script>
+  <script src="js/modules/qr_parser.js"></script>
+  <script src="js/modules/crypto.js"></script>
+  <script src="js/modules/ui.js"></script>
+  <script src="js/modules/events.js"></script>
+  <script src="js/modules/main.js"></script>
+</body>
+</html>
