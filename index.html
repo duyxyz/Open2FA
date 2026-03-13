@@ -292,9 +292,19 @@
             <p>Kéo thả file vào đây hoặc <label for="importFile" class="btn-link">chọn file</label></p>
             <input type="file" id="importFile" accept=".json,.txt" hidden>
           </div>
-          <div class="form-group">
-            <label>Mật khẩu giải mã (nếu file mã hóa)</label>
-            <input type="password" id="importPassword" placeholder="Nhập mật khẩu">
+          <div id="importFileInfo" style="display: none; padding: 10px; border-radius: var(--radius); background: var(--bg-tertiary); margin-bottom: 20px; font-size: 14px; color: var(--text-secondary); align-items: center; gap: 10px;">
+            <i class="fas fa-file-alt"></i>
+            <span id="importFileName" style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">filename.json</span>
+            <button class="btn-ghost btn-sm" id="btnChangeFile" style="padding: 4px 8px;">Đổi file</button>
+          </div>
+          <div class="form-group" id="importPasswordGroup" style="display: none;">
+            <label>Mật khẩu giải mã</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="password" id="importPassword" placeholder="Nhập mật khẩu" style="flex: 1;">
+              <button class="btn-primary" id="btnDecryptImport">
+                <i class="fas fa-key"></i> Giải mã
+              </button>
+            </div>
           </div>
           <div class="form-group" style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
             <label style="margin-bottom: 0; white-space: nowrap;">Chế độ nhập:</label>

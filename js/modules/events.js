@@ -79,52 +79,106 @@ window.setupImportDropzone = function() {
 
     const btnConfirm = document.getElementById('btnConfirmImport');
     if (btnConfirm) btnConfirm.addEventListener('click', confirmImport);
+
+    const btnDecrypt = document.getElementById('btnDecryptImport');
+    if (btnDecrypt) btnDecrypt.addEventListener('click', decryptImportFile);
+
+    const btnChangeFile = document.getElementById('btnChangeFile');
+    if (btnChangeFile) {
+        btnChangeFile.addEventListener('click', () => {
+            appState.pendingEncryptedData = null;
+            document.getElementById('importFileInfo').style.display = 'none';
+            document.getElementById('importDropzone').style.display = 'flex';
+            document.getElementById('importPasswordGroup').style.display = 'none';
+            document.getElementById('importPreview').classList.remove('active');
+            if (btnConfirm) btnConfirm.disabled = true;
+            fileInput.value = '';
+        });
+    }
 };
 
 window.handleImportFile = async function(file) {
     const reader = new FileReader();
+    const dropzone = document.getElementById('importDropzone');
+    const fileInfo = document.getElementById('importFileInfo');
+    const fileName = document.getElementById('importFileName');
+    const passwordGroup = document.getElementById('importPasswordGroup');
+    const preview = document.getElementById('importPreview');
+    const btnConfirm = document.getElementById('btnConfirmImport');
+
     reader.onload = async (e) => {
       try {
         const content = e.target.result;
         const data = JSON.parse(content);
         
+        // Show file info
+        if (dropzone) dropzone.style.display = 'none';
+        if (fileInfo) fileInfo.style.display = 'flex';
+        if (fileName) fileName.textContent = file.name;
+        
         if (data.iv && data.data) {
-          const password = document.getElementById('importPassword').value;
-          if (!password) {
-            showToast('Vui lòng nhập mật khẩu để giải mã', 'error');
-            return;
-          }
-          
-          try {
-            const decrypted = await decryptData(data, password);
-            appState.importData = JSON.parse(decrypted);
-          } catch (err) {
-            showToast('Mật khẩu không đúng', 'error');
-            return;
-          }
+          // Encrypted file
+          appState.pendingEncryptedData = data;
+          if (passwordGroup) passwordGroup.style.display = 'block';
+          if (preview) preview.classList.remove('active');
+          if (btnConfirm) btnConfirm.disabled = true;
+          showToast('File đã mã hóa. Vui lòng nhập mật khẩu.', 'info');
         } else if (Array.isArray(data)) {
+          // Plain JSON
           appState.importData = data;
+          if (passwordGroup) passwordGroup.style.display = 'none';
+          showImportPreview();
         } else {
-          throw new Error('Invalid format');
+          throw new Error('Định dạng không hợp lệ');
         }
-
-        const preview = document.getElementById('importPreview');
-        if (preview) {
-            preview.innerHTML = `<strong>Tìm thấy ${appState.importData.length} token:</strong><br>` +
-                appState.importData.slice(0, 5).map(t => `• ${t.name} (${t.account})`).join('<br>') +
-              (appState.importData.length > 5 ? `<br>... và ${appState.importData.length - 5} token khác` : '');
-            preview.classList.add('active');
-        }
-        
-        const btnConfirm = document.getElementById('btnConfirmImport');
-        if (btnConfirm) btnConfirm.disabled = false;
-        
-        showToast('Tải file thành công', 'success');
       } catch (err) {
-        showToast('File không hợp lệ', 'error');
+        console.error('Import error:', err);
+        showToast('File không hợp lệ hoặc bị lỗi', 'error');
+        // Reset UI
+        if (dropzone) dropzone.style.display = 'flex';
+        if (fileInfo) fileInfo.style.display = 'none';
       }
     };
     reader.readAsText(file);
+};
+
+window.decryptImportFile = async function() {
+    const password = document.getElementById('importPassword').value;
+    if (!password) {
+        showToast('Vui lòng nhập mật khẩu', 'warning');
+        return;
+    }
+
+    if (!appState.pendingEncryptedData) return;
+
+    try {
+        showToast('Đang giải mã...', 'info');
+        const decrypted = await decryptData(appState.pendingEncryptedData, password);
+        appState.importData = JSON.parse(decrypted);
+        appState.pendingEncryptedData = null; // Clear pending once decrypted
+        
+        showImportPreview();
+        showToast('Giải mã thành công', 'success');
+        document.getElementById('importPasswordGroup').style.display = 'none';
+        document.getElementById('importPassword').value = '';
+    } catch (err) {
+        console.error('Decryption error:', err);
+        showToast('Mật khẩu không đúng hoặc file lỗi', 'error');
+    }
+};
+
+window.showImportPreview = function() {
+    const preview = document.getElementById('importPreview');
+    const btnConfirm = document.getElementById('btnConfirmImport');
+    
+    if (preview && appState.importData) {
+        preview.innerHTML = `<strong>Tìm thấy ${appState.importData.length} token:</strong><br>` +
+            appState.importData.slice(0, 5).map(t => `• ${t.name} (${t.account})`).join('<br>') +
+          (appState.importData.length > 5 ? `<br>... và ${appState.importData.length - 5} token khác` : '');
+        preview.classList.add('active');
+    }
+    
+    if (btnConfirm) btnConfirm.disabled = false;
 };
 
 window.confirmImport = function() {
