@@ -31,8 +31,6 @@ async function handleAuthStateChange(event, session) {
         appState.currentUser = session.user;
         updateAuthUI(true);
         updateSyncStatus('online');
-        // Explicitly clear local tokens storage to ensure no local traces
-        localStorage.removeItem('secureauth_tokens');
         subscribeToUserSync(session.user.id);
         // Load tokens from cloud, it is the source of truth
         await loadFromCloud();

@@ -1,29 +1,9 @@
 // Storage Management
 window.loadState = function() {
-    // Load settings
-    const settingsJson = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    if (settingsJson) {
-      try {
-        appState.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(settingsJson) };
-      } catch (e) {
-        appState.settings = { ...DEFAULT_SETTINGS };
-      }
-    }
-
-    // Load tokens - SKIP for cloud-only data policy
-    // We only load from Supabase now once logged in.
+    // Reset to defaults - NO LOCALSTORAGE
+    appState.settings = { ...DEFAULT_SETTINGS };
     appState.tokens = []; 
-
-
-    // Load activity
-    const activityJson = localStorage.getItem(STORAGE_KEYS.ACTIVITY);
-    if (activityJson) {
-      try {
-        appState.activities = JSON.parse(activityJson);
-      } catch (e) {
-        appState.activities = [];
-      }
-    }
+    appState.activities = [];
 };
 
 // Save state
@@ -32,22 +12,20 @@ window.saveTokens = function() {
         // Cloud is source of truth when logged in
         if (window.pushToCloud) window.pushToCloud();
     } else {
-        // Offline fallback: DISABLED - No local tokens for security
-        console.log('[Storage] Save tokens ignored - user not logged in');
+        console.log('[Storage] Save tokens ignored - user not logged in (Cloud-Only Policy)');
     }
-    if (window.updateStats) window.updateStats();
 };
 
 window.saveSettings = function() {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appState.settings));
+    // NO LOCALSTORAGE - Settings are managed via appState and synced to cloud in sync.js
+    console.log('[Storage] Settings updated in memory');
 };
 
 window.saveActivity = function(activity) {
-    const activities = JSON.parse(localStorage.getItem(STORAGE_KEYS.ACTIVITY) || '[]');
-    activities.unshift({
+    // Activities are session-only unless we decide to sync them to cloud later
+    appState.activities.unshift({
         ...activity,
         time: new Date().toISOString()
     });
-    if (activities.length > 100) activities.pop();
-    localStorage.setItem(STORAGE_KEYS.ACTIVITY, JSON.stringify(activities));
+    if (appState.activities.length > 100) appState.activities.pop();
 };
