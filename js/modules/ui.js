@@ -151,7 +151,7 @@ window.createTokenCard = function(token, index) {
             <div class="token-account">${token.account}</div>
           </div>
           <button class="edit-btn" data-id="${token.id}" data-action="edit" title="Chỉnh sửa">
-            <i class="fas fa-edit"></i>
+            <i class="fas fa-ellipsis-v"></i>
           </button>
         </div>
         <div class="token-card-body">

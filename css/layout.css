@@ -144,10 +144,18 @@
   background: rgba(13, 17, 23, 0.8);
 }
 
-.header-left, .header-right {
+.header-left {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .logo {
@@ -163,10 +171,6 @@
   font-size: 24px;
 }
 
-.header-center {
-  flex: 1;
-  max-width: 480px;
-}
 
 /* Header UI Elements */
 .search-box {
@@ -382,23 +386,17 @@
     padding: 16px;
   }
 
-  .header-center {
-    flex: 0 0 40px;
-    height: 40px;
-    margin-left: auto;
-    margin-right: 8px;
-  }
 
   .search-box {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .search-box input {
     position: absolute;
     right: 0;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: none;
     border-radius: var(--radius-lg);
@@ -430,11 +428,12 @@
   .search-box:focus-within,
   .search-box:has(input:not(:placeholder-shown)) {
     position: fixed;
-    top: 72px; /* Dưới header */
+    bottom: 24px; /* Move to bottom */
+    top: auto;
     left: 16px;
     right: 16px;
     width: calc(100% - 32px);
-    height: 48px;
+    height: 52px;
     z-index: 999;
   }
 
