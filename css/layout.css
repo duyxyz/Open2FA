@@ -154,8 +154,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
-  justify-content: flex-end;
 }
 
 .logo {
@@ -380,16 +378,24 @@
 @media (max-width: 768px) {
   .header {
     padding: 12px 16px;
+    justify-content: space-between;
   }
 
-  .content {
-    padding: 16px;
+  /* Keep search box in header as button */
+  .header .search-box {
+    order: -1; /* Place before other buttons in header-right */
   }
 
+  /* Fix position:fixed being relative to header due to backdrop-filter */
+  .header:has(.search-box input:focus) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 
   .search-box {
     width: 36px;
     height: 36px;
+    position: relative;
   }
 
   .search-box input {
@@ -428,13 +434,13 @@
   .search-box:focus-within,
   .search-box:has(input:not(:placeholder-shown)) {
     position: fixed;
-    bottom: 24px; /* Move to bottom */
+    bottom: 24px;
     top: auto;
-    left: 16px;
-    right: 16px;
-    width: calc(100% - 32px);
-    height: 52px;
-    z-index: 999;
+    left: 20px;
+    right: 20px;
+    width: calc(100% - 40px);
+    height: 54px;
+    z-index: 1001;
   }
 
   .search-box:focus-within input,
@@ -442,11 +448,11 @@
     width: 100%;
     height: 100%;
     color: var(--text-primary);
-    padding: 10px 48px;
+    padding: 12px 52px;
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
     cursor: text;
   }
 
@@ -463,6 +469,7 @@
   .search-box:has(input:not(:placeholder-shown)) i {
     left: 24px;
     color: var(--primary);
+    font-size: 18px;
   }
 }
 
