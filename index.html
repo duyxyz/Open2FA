@@ -359,9 +359,16 @@
             <input type="text" id="modalSearchInput" placeholder="Tìm kiếm tài khoản..." style="width:100%; padding:10px 10px 10px 38px; border:1px solid var(--border); border-radius:var(--radius-full); background:var(--bg-tertiary); color:var(--text-primary); outline:none;">
           </div>
         </div>
-        <div class="modal-body" style="padding:0;">
-          <!-- Results will be visible through the main grid filtering, or we could clone the grid here if needed. 
-               For now, we just let it filter the background grid. -->
+        <div class="modal-body" style="padding: 24px;">
+          <div id="modalSearchGrid" class="token-grid"></div>
+          
+          <div id="searchEmptyState" class="empty-state" style="display: none; padding-top: 40px;">
+            <div class="empty-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3>Không tìm thấy kết quả</h3>
+            <p>Thử tìm kiếm với một từ khóa khác</p>
+          </div>
         </div>
       </div>
     </div>

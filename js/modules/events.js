@@ -351,13 +351,15 @@ window.setupEventListeners = function() {
     if (DOM.searchInput) DOM.searchInput.addEventListener('input', () => renderTokens());
     
     const modalSearchInput = document.getElementById('modalSearchInput');
-    if (modalSearchInput) modalSearchInput.addEventListener('input', () => renderTokens());
+    if (modalSearchInput) modalSearchInput.addEventListener('input', () => renderSearchResults());
 
     // Search button click handling for mobile
     const searchBtn = document.querySelector('.header .search-box i');
     if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
+        searchBtn.addEventListener('click', (e) => {
             if (window.innerWidth <= 768) {
+                e.preventDefault();
+                e.stopPropagation();
                 openModal('searchModal');
             }
         });
@@ -371,14 +373,33 @@ window.setupEventListeners = function() {
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            closeModal(btn.dataset.close);
+            const modalId = btn.dataset.close;
+            closeModal(modalId);
+            // Clear search on close
+            if (modalId === 'searchModal') {
+                const input = document.getElementById('modalSearchInput');
+                const grid = document.getElementById('modalSearchGrid');
+                if (input) input.value = '';
+                if (grid) grid.innerHTML = '';
+                renderTokens(); 
+            }
         });
     });
 
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', () => {
             const modal = overlay.closest('.modal');
-            if (modal) closeModal(modal.id);
+            if (modal) {
+                closeModal(modal.id);
+                // Clear search on close
+                if (modal.id === 'searchModal') {
+                    const input = document.getElementById('modalSearchInput');
+                    const grid = document.getElementById('modalSearchGrid');
+                    if (input) input.value = '';
+                    if (grid) grid.innerHTML = '';
+                    renderTokens(); // Restore main grid state
+                }
+            }
         });
     });
 

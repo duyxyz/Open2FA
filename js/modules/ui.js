@@ -134,10 +134,10 @@ window.renderTokens = function(force = false) {
     });
 };
 
-window.filterTokens = function(tokens) {
-    const headerInput = document.getElementById('searchInput');
-    const modalInput = document.getElementById('modalSearchInput');
-    const query = (modalInput?.value || headerInput?.value || '').toLowerCase();
+window.filterTokens = function(tokens, source = 'header') {
+    const inputId = source === 'modal' ? 'modalSearchInput' : 'searchInput';
+    const input = document.getElementById(inputId);
+    const query = (input?.value || '').toLowerCase();
 
     return tokens.filter(token => {
       const matchesSearch = !query || 
@@ -147,6 +147,24 @@ window.filterTokens = function(tokens) {
       
       return matchesSearch;
     });
+};
+
+window.renderSearchResults = function() {
+    const modalGrid = document.getElementById('modalSearchGrid');
+    const emptyState = document.getElementById('searchEmptyState');
+    if (!modalGrid) return;
+
+    const filtered = filterTokens(appState.tokens, 'modal');
+    
+    if (filtered.length === 0) {
+        modalGrid.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'block';
+    } else {
+        if (emptyState) emptyState.style.display = 'none';
+        modalGrid.innerHTML = filtered.map((token, index) => createTokenCard(token, index)).join('');
+        attachTokenEvents();
+        updateTokens();
+    }
 };
 
 window.createTokenCard = function(token, index) {
