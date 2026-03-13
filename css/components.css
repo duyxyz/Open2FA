@@ -768,7 +768,7 @@
 
 /* Settings */
 .settings-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .settings-section:last-child {
@@ -776,19 +776,19 @@
 }
 
 .settings-section h3 {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .setting-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -804,9 +804,9 @@
 }
 
 .setting-info p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
 }
 
 .select-sm {

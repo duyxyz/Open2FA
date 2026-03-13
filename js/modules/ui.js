@@ -76,10 +76,12 @@ window.openModal = function(modalId) {
     }
 
     modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
 };
 
 window.closeModal = function(modalId) {
     document.getElementById(modalId).setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
 };
 
 window.resetTokenForm = function() {

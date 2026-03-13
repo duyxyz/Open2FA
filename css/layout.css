@@ -28,6 +28,10 @@
   min-height: 100dvh;
 }
 
+body.no-scroll {
+  overflow: hidden;
+}
+
 .login-gate-logo {
   text-align: center;
   margin-bottom: 32px;
@@ -278,9 +282,9 @@
 
 .user-info-card {
   text-align: center;
-  padding: 16px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .avatar-wrapper {
@@ -301,17 +305,17 @@
 }
 
 .user-avatar-large {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--primary-light);
   color: var(--primary);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
+  margin: 0 auto 8px;
   overflow: hidden;
   border: 2px solid var(--border);
 }
