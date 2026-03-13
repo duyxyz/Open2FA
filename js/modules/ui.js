@@ -187,11 +187,11 @@ window.createTokenCard = function(token, index) {
         </div>
         <div class="token-card-body">
           <div class="token-otp-container">
-            <div class="token-otp" id="otp-${token.id}">------</div>
+            <div class="token-otp token-otp-value">------</div>
             <div class="token-timer pizza-timer">
               <svg viewBox="0 0 32 32">
                 <circle class="pizza-bg" cx="16" cy="16" r="16"></circle>
-                <circle class="pizza-slice" id="timer-${token.id}" cx="16" cy="16" r="8" stroke-width="16"></circle>
+                <circle class="pizza-slice token-timer-circle" cx="16" cy="16" r="8" stroke-width="16"></circle>
               </svg>
             </div>
           </div>
@@ -303,32 +303,38 @@ window.startTokenUpdate = function() {
 };
 
 window.updateTokens = async function() {
-    const tokens = filterTokens(appState.tokens);
     const timeRemaining = TOTP.getTimeRemaining(30);
     const percentage = (timeRemaining / 30) * 100;
-    for (const token of tokens) {
-      const otpElement = document.getElementById(`otp-${token.id}`);
-      const timerCircle = document.getElementById(`timer-${token.id}`);
+    const fullTime = Math.floor(Date.now() / 1000);
 
-      if (otpElement) {
-        const fullTime = Math.floor(Date.now() / 1000);
-        if (!otpElement.lastUpdate || otpElement.lastUpdate !== fullTime) {
+    const tokenCards = document.querySelectorAll('.token-card');
+    
+    // Group elements by token ID to avoid redundant calculations
+    const tokenGroups = {};
+    appState.tokens.forEach(t => tokenGroups[t.id] = t);
+
+    tokenCards.forEach(card => {
+        const id = card.dataset.id;
+        const token = tokenGroups[id];
+        if (!token) return;
+
+        const otpElement = card.querySelector('.token-otp-value');
+        const timerCircle = card.querySelector('.token-timer-circle');
+
+        if (otpElement && (!otpElement.lastUpdate || otpElement.lastUpdate !== fullTime)) {
             TOTP.generateAsync(token.secret).then(code => {
                 otpElement.textContent = code;
                 otpElement.lastUpdate = fullTime;
             });
         }
-      }
 
-      if (timerCircle) {
-        const circumference = 50.265;
-        const offset = (percentage / 100) * circumference;
-        timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
-        
-        // Keep timer color constant (not turning red)
-        timerCircle.style.stroke = 'var(--timer-color)';
-      }
-    }
+        if (timerCircle) {
+            const circumference = 50.265;
+            const offset = (percentage / 100) * circumference;
+            timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
+            timerCircle.style.stroke = 'var(--timer-color)';
+        }
+    });
 };
 
 window.showCopyFeedback = function() {

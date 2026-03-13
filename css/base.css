@@ -22,6 +22,12 @@ body {
   overflow-x: hidden;
 }
 
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
+}
+
 #app {
   min-height: 100vh;
   min-height: 100dvh;
