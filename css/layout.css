@@ -383,7 +383,8 @@
   }
 
   .header-center {
-    flex: 0;
+    flex: 0 0 40px;
+    height: 40px;
     margin-left: auto;
     margin-right: 8px;
   }
@@ -391,7 +392,6 @@
   .search-box {
     width: 40px;
     height: 40px;
-    transition: var(--transition);
   }
 
   .search-box input {
@@ -405,7 +405,7 @@
     background: var(--bg-tertiary);
     color: transparent;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .search-box input::placeholder {
@@ -413,11 +413,14 @@
   }
 
   .search-box i {
+    position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    transition: var(--transition);
+    color: var(--text-secondary);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
   }
 
   .search-box kbd {
@@ -426,29 +429,30 @@
 
   .search-box:focus-within,
   .search-box:has(input:not(:placeholder-shown)) {
-    position: absolute;
+    position: fixed;
+    top: 72px; /* Dưới header */
     left: 16px;
     right: 16px;
-    width: auto;
-    height: 40px;
-    z-index: 110;
+    width: calc(100% - 32px);
+    height: 48px;
+    z-index: 999;
   }
 
   .search-box:focus-within input,
   .search-box:has(input:not(:placeholder-shown)) input {
     width: 100%;
-    height: 40px;
+    height: 100%;
     color: var(--text-primary);
-    padding: 10px 42px;
+    padding: 10px 48px;
     background: var(--bg-primary);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius-full);
+    box-shadow: var(--shadow-xl);
     cursor: text;
   }
 
-  .search-box:focus-within input {
+  .search-box:focus-within input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
   }
 
   .search-box:focus-within input::placeholder,
@@ -458,9 +462,8 @@
 
   .search-box:focus-within i,
   .search-box:has(input:not(:placeholder-shown)) i {
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 24px;
+    color: var(--primary);
   }
 }
 
