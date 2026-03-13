@@ -77,10 +77,17 @@ window.openModal = function(modalId) {
 
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('no-scroll');
+
+    // Auto focus search input
+    if (modalId === 'searchModal') {
+        const input = document.getElementById('modalSearchInput');
+        if (input) setTimeout(() => input.focus(), 400);
+    }
 };
 
 window.closeModal = function(modalId) {
-    document.getElementById(modalId).setAttribute('aria-hidden', 'true');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('no-scroll');
 };
 
@@ -128,11 +135,15 @@ window.renderTokens = function(force = false) {
 };
 
 window.filterTokens = function(tokens) {
+    const headerInput = document.getElementById('searchInput');
+    const modalInput = document.getElementById('modalSearchInput');
+    const query = (modalInput?.value || headerInput?.value || '').toLowerCase();
+
     return tokens.filter(token => {
-      const matchesSearch = !appState.searchQuery || 
-        token.name.toLowerCase().includes(appState.searchQuery.toLowerCase()) ||
-        token.account.toLowerCase().includes(appState.searchQuery.toLowerCase()) ||
-        (token.issuer && token.issuer.toLowerCase().includes(appState.searchQuery.toLowerCase()));
+      const matchesSearch = !query || 
+        token.name.toLowerCase().includes(query) ||
+        token.account.toLowerCase().includes(query) ||
+        (token.issuer && token.issuer.toLowerCase().includes(query));
       
       return matchesSearch;
     });

@@ -346,6 +346,26 @@
       </div>
     </div>
 
+    <!-- Search Modal (Mobile Side Panel) -->
+    <div id="searchModal" class="modal side-panel" aria-hidden="true">
+      <div class="modal-overlay" data-close="searchModal"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <button class="modal-close" style="background:none; border:none; color:var(--text-secondary); width:auto; height:auto; padding:0; margin-right:12px;" data-close="searchModal">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div class="search-modal-box" style="flex:1; position:relative;">
+            <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-tertiary);"></i>
+            <input type="text" id="modalSearchInput" placeholder="Tìm kiếm tài khoản..." style="width:100%; padding:10px 10px 10px 38px; border:1px solid var(--border); border-radius:var(--radius-full); background:var(--bg-tertiary); color:var(--text-primary); outline:none;">
+          </div>
+        </div>
+        <div class="modal-body" style="padding:0;">
+          <!-- Results will be visible through the main grid filtering, or we could clone the grid here if needed. 
+               For now, we just let it filter the background grid. -->
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div id="toastContainer" class="toast-container"></div>
 

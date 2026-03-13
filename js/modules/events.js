@@ -348,10 +348,20 @@ window.setupEventListeners = function() {
     });
 
     // 5. Search & Filters
-    if (DOM.searchInput) DOM.searchInput.addEventListener('input', (e) => {
-        appState.searchQuery = e.target.value;
-        renderTokens();
-    });
+    if (DOM.searchInput) DOM.searchInput.addEventListener('input', () => renderTokens());
+    
+    const modalSearchInput = document.getElementById('modalSearchInput');
+    if (modalSearchInput) modalSearchInput.addEventListener('input', () => renderTokens());
+
+    // Search button click handling for mobile
+    const searchBtn = document.querySelector('.header .search-box i');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                openModal('searchModal');
+            }
+        });
+    }
 
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
