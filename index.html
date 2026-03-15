@@ -26,6 +26,8 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
+  
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -429,6 +431,7 @@
                 <label>Xác nhận Mật khẩu</label>
                 <input type="password" id="authConfirmPassword" placeholder="••••••••">
               </div>
+              <div class="cf-turnstile form-group" data-sitekey="0x4AAAAAACrKZoktHZEB1FHk" style="margin-top: 10px; display: flex; justify-content: center;"></div>
               <button type="submit" class="btn-primary w-full" id="btnAuthSubmit" style="width: 100%; margin-top: 16px;">
                 <md-ripple></md-ripple>
                 Đăng nhập

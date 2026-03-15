@@ -123,16 +123,27 @@ window.handleAuthAction = async function(e, type = 'modal') {
     }
 
     try {
+        const captchaToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+
         if (appState.isRegisterMode) {
             const { error } = await supabaseClient.auth.signUp({ 
                 email, 
                 password,
-                options: { emailRedirectTo: window.location.origin }
+                options: { 
+                    emailRedirectTo: window.location.origin,
+                    captchaToken: captchaToken || undefined
+                }
             });
             if (error) throw error;
             showToast('Đăng ký thành công! Vui lòng kiểm tra email xác nhận.', 'success');
         } else {
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { error } = await supabaseClient.auth.signInWithPassword({ 
+                email, 
+                password,
+                options: {
+                    captchaToken: captchaToken || undefined
+                }
+            });
             if (error) throw error;
             showToast('Đăng nhập thành công', 'success');
             if (type === 'modal') closeModal('authModal');
