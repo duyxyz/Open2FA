@@ -43,6 +43,8 @@ async function handleAuthStateChange(event, session) {
 function updateAuthUI(isLoggedIn) {
     const loginGate = document.getElementById('loginGate');
     const mainApp = document.getElementById('mainApp');
+    const emptyAuthView = document.getElementById('emptyAuthView');
+    const emptyUnauthView = document.getElementById('emptyUnauthView');
 
     if (isLoggedIn) {
         // App is always shown now, no need to toggle main layout
@@ -50,6 +52,9 @@ function updateAuthUI(isLoggedIn) {
         if (!DOM.btnAuth) return;
         DOM.btnAuth.style.display = 'none';
         DOM.userProfile.style.display = 'flex';
+        
+        if (emptyAuthView) emptyAuthView.style.display = 'block';
+        if (emptyUnauthView) emptyUnauthView.style.display = 'none';
         
         const user = appState.currentUser;
         const email = user.email || 'User';
@@ -74,6 +79,10 @@ function updateAuthUI(isLoggedIn) {
         if (!DOM.btnAuth) return;
         DOM.btnAuth.style.display = 'flex';
         DOM.userProfile.style.display = 'none';
+        
+        if (emptyAuthView) emptyAuthView.style.display = 'none';
+        if (emptyUnauthView) emptyUnauthView.style.display = 'flex';
+        
         if (DOM.authView) DOM.authView.style.display = 'block';
         if (DOM.profileView) DOM.profileView.style.display = 'none';
         if (DOM.authTitle) DOM.authTitle.textContent = appState.isRegisterMode ? 'Đăng ký' : 'Đăng nhập';

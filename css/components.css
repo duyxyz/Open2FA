@@ -548,6 +548,11 @@
     padding-right: 60px; /* Shift it slightly left to align under the + icon */
   }
   
+  /* Specific alignment for Auth dropdown */
+  #authModal.modal.dropdown {
+    padding-right: 24px; /* Align slightly right under the user icon */
+  }
+  
   .modal.dropdown .modal-overlay {
     background: transparent;
   }
@@ -1014,6 +1019,29 @@ input:checked+.slider:before {
 .import-dropzone p {
   color: var(--text-secondary);
   font-size: 14px;
+}
+
+.empty-icon i {
+  font-size: 40px;
+}
+
+#emptyUnauthView {
+  display: flex !important; /* Managed by JS, but if visible it should be flex */
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 50vh;
+}
+#emptyUnauthView[style*="display: none"] {
+  display: none !important;
+}
+
+.empty-state h3 {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+  font-size: 13px;
 }
 
 .import-preview {

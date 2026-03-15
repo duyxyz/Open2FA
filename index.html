@@ -115,20 +115,30 @@
       <main class="content">
         <div id="tokenGrid" class="token-grid"></div>
         <div id="emptyState" class="empty-state">
-          <div class="empty-icon">
-            <i class="fas fa-shield-virus"></i>
+          <!-- Unauthenticated View -->
+          <div id="emptyUnauthView" style="display: none;">
+            <div class="empty-icon" style="font-size: 64px; color: var(--text-tertiary);">
+              <i class="fas fa-lock"></i>
+            </div>
           </div>
-          <h3>Chưa có token nào</h3>
-          <p>Thêm token đầu tiên của bạn bằng cách quét mã QR hoặc nhập thủ công</p>
-          <div class="empty-actions">
-            <button id="btnEmptyAdd" class="btn-primary">
-              <md-ripple></md-ripple>
-              <i class="fas fa-plus"></i> Thêm token
-            </button>
-            <button id="btnEmptyImport" class="btn-secondary">
-              <md-ripple></md-ripple>
-              <i class="fas fa-file-import"></i> Nhập khẩu
-            </button>
+          
+          <!-- Authenticated View -->
+          <div id="emptyAuthView">
+            <div class="empty-icon">
+              <i class="fas fa-shield-virus"></i>
+            </div>
+            <h3>Chưa có token nào</h3>
+            <p>Thêm token đầu tiên của bạn bằng cách quét mã QR hoặc nhập thủ công</p>
+            <div class="empty-actions">
+              <button id="btnEmptyAdd" class="btn-primary">
+                <md-ripple></md-ripple>
+                <i class="fas fa-plus"></i> Thêm token
+              </button>
+              <button id="btnEmptyImport" class="btn-secondary">
+                <md-ripple></md-ripple>
+                <i class="fas fa-file-import"></i> Nhập khẩu
+              </button>
+            </div>
           </div>
         </div>
       </main>

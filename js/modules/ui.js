@@ -62,14 +62,14 @@ window.openModal = function (modalId) {
 
   if ((modalId === 'addTokenModal' || modalId === 'exportModal') && !appState.currentUser) {
     showToast('Vui lòng đăng nhập để sử dụng tính năng này', 'info');
-    // When opening authModal from a restricted action, show it as modal, not dropdown
-    document.getElementById('authModal').classList.remove('dropdown');
+    // Force authModal to open as dropdown, which is the desired behavior for login
+    document.getElementById('authModal').classList.add('dropdown');
     document.getElementById('authModal').setAttribute('aria-hidden', 'false');
     return;
   }
 
-  // Special handling for authModal and addTokenModal to show as dropdown
-  if ((modalId === 'authModal' && appState.currentUser) || modalId === 'addTokenModal') {
+  // Always show authModal and addTokenModal as dropdowns on PC
+  if (modalId === 'authModal' || modalId === 'addTokenModal') {
     modal.classList.add('dropdown');
   } else {
     modal.classList.remove('dropdown');
