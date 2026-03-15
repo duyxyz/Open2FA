@@ -33,12 +33,15 @@ window.renderSkeletons = function () {
 };
 
 window.applyTheme = function () {
+  const metaThemeColor = document.getElementById('metaThemeColor');
   if (appState.settings.darkMode) {
     document.documentElement.setAttribute('data-theme', 'dark');
     if (document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = true;
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#0d1117');
   } else {
     document.documentElement.removeAttribute('data-theme');
     if (document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = false;
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
   }
 };
 
