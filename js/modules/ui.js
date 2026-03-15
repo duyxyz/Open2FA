@@ -68,8 +68,8 @@ window.openModal = function(modalId) {
         return;
     }
 
-    // Special handling for authModal when logged in: show as dropdown
-    if (modalId === 'authModal' && appState.currentUser) {
+    // Special handling for authModal and addTokenModal to show as dropdown
+    if ((modalId === 'authModal' && appState.currentUser) || modalId === 'addTokenModal') {
         modal.classList.add('dropdown');
     } else {
         modal.classList.remove('dropdown');

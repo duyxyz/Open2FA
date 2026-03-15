@@ -534,12 +534,17 @@
     max-width: 400px;
   }
 
-  /* Dropdown Variant (for Auth Modal) */
+  /* Dropdown Variant */
   .modal.dropdown {
     justify-content: flex-end;
     align-items: flex-start;
     padding-top: 70px;
     padding-right: 20px;
+  }
+  
+  /* Specific alignment for the Add Token dropdown */
+  #addTokenModal.modal.dropdown {
+    padding-right: 60px; /* Shift it slightly left to align under the + icon */
   }
   
   .modal.dropdown .modal-overlay {
