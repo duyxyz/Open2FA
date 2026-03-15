@@ -418,15 +418,10 @@
         </div>
         <div class="modal-body">
           <div id="authView">
-            <button id="btnGoogleLogin" class="btn-secondary w-full" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; border: 1px solid var(--border);">
+            <button id="btnGoogleLogin" class="btn-secondary w-full" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: 1px solid var(--border);">
               <md-ripple></md-ripple>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="Google logo">
               Tiếp tục với Google
-            </button>
-            <button id="btnPasskeyLogin" class="btn-secondary w-full" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: 1px solid var(--border);">
-              <md-ripple></md-ripple>
-              <i class="fas fa-fingerprint" style="font-size: 18px; color: var(--primary);"></i>
-              Đăng nhập bằng Passkey
             </button>
             
             <div class="auth-divider">
@@ -474,22 +469,6 @@
                   <input type="checkbox" id="darkModeToggle">
                   <span class="slider"></span>
                 </label>
-              </div>
-            </div>
-
-            <div class="settings-section">
-              <h3>Bảo mật & Passkey</h3>
-              <div class="setting-item">
-                <div class="setting-info" style="flex: 1;">
-                  <label>Xác thực sinh trắc học</label>
-                  <p>Sử dụng vân tay, khuôn mặt hoặc PIN</p>
-                </div>
-                <button class="btn-secondary btn-sm" id="btnEnrollPasskey">
-                  <i class="fas fa-plus"></i> Đăng ký
-                </button>
-              </div>
-              <div id="passkeysContainer" style="margin-top: 12px; display: none;">
-                <!-- Passkeys list will be rendered here -->
               </div>
             </div>
 

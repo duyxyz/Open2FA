@@ -73,9 +73,6 @@ function updateAuthUI(isLoggedIn) {
         if (DOM.authView) DOM.authView.style.display = 'none';
         if (DOM.profileView) DOM.profileView.style.display = 'block';
         if (DOM.authTitle) DOM.authTitle.textContent = 'Tài khoản';
-        
-        // Load passkeys whenever profile opens
-        if (window.loadPasskeys) window.loadPasskeys();
     } else {
         // App is always shown now
         
@@ -339,93 +336,3 @@ async function decryptTokens(encryptedObj) {
         return null;
     }
 }
-
-// === PASSKEY / WEBAUTHN INTEGRATION ===
-
-window.enrollPasskey = async function() {
-    if (!supabaseClient || !appState.currentUser) return;
-    try {
-        const { data: enrollData, error: enrollError } = await supabaseClient.auth.mfa.webAuthn.enroll();
-        if (enrollError) throw enrollError;
-        
-        const { data: challengeData, error: challengeError } = await supabaseClient.auth.mfa.challenge({
-            factorId: enrollData.id
-        });
-        if (challengeError) throw challengeError;
-        
-        const { error: verifyError } = await supabaseClient.auth.mfa.webAuthn.verify({
-            factorId: enrollData.id,
-            challengeId: challengeData.id
-        });
-        if (verifyError) throw verifyError;
-        
-        showToast('Đăng ký Passkey thành công!', 'success');
-        if (window.loadPasskeys) window.loadPasskeys();
-    } catch (error) {
-        showToast('Lỗi đăng ký Passkey: ' + (error.message || 'Hủy bỏ'), 'error');
-        console.error('[Passkey Enroll Error]', error);
-    }
-};
-
-window.loginWithPasskey = async function() {
-    if (!supabaseClient) return;
-    const emailInput = document.getElementById('authEmail');
-    const email = emailInput ? emailInput.value.trim() : '';
-    
-    if (!email) {
-        showToast('Vui lòng nhập Email trước khi dùng Passkey', 'warning');
-        if (emailInput) emailInput.focus();
-        return;
-    }
-    
-    const captchaInput = document.querySelector('[name="cf-turnstile-response"]');
-    const captchaToken = captchaInput ? captchaInput.value : null;
-
-    try {
-        const { data, error } = await supabaseClient.auth.signInWithWebAuthn({
-            email: email,
-            options: {
-                captchaToken: captchaToken || undefined
-            }
-        });
-        if (error) throw error;
-        showToast('Đăng nhập Passkey thành công!', 'success');
-        if (window.closeModal) closeModal('authModal');
-    } catch (error) {
-        showToast('Lỗi đăng nhập Passkey: ' + (error.message || 'Thất bại'), 'error');
-        console.error('[Passkey Login Error]', error);
-    }
-};
-
-window.loadPasskeys = async function() {
-    if (!supabaseClient || !appState.currentUser) return;
-    try {
-        const { data, error } = await supabaseClient.auth.mfa.listFactors();
-        if (error) throw error;
-        
-        // Filter for webauthn factors
-        const passkeys = (data.all || []).filter(factor => factor.factor_type === 'webauthn');
-        
-        if (window.renderPasskeysList) {
-            window.renderPasskeysList(passkeys);
-        }
-    } catch (error) {
-        console.error('[Passkey Load Error]', error);
-    }
-};
-
-window.deletePasskey = async function(factorId) {
-    if (!supabaseClient || !appState.currentUser) return;
-    try {
-        const { error } = await supabaseClient.auth.mfa.unenroll({
-            factorId: factorId
-        });
-        if (error) throw error;
-        showToast('Đã xóa Passkey', 'success');
-        if (window.loadPasskeys) window.loadPasskeys();
-    } catch (error) {
-        showToast('Lỗi xóa Passkey: ' + error.message, 'error');
-        console.error('[Passkey Delete Error]', error);
-    }
-};
-

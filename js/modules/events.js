@@ -357,7 +357,6 @@ window.setupEventListeners = function() {
 
     bind(DOM.btnUser, 'click', () => openModal('authModal'));
     bind(DOM.btnGoogleLogin, 'click', () => window.signInWithGoogle());
-    bindById('btnPasskeyLogin', 'click', () => { if (window.loginWithPasskey) window.loginWithPasskey(); });
 
     bind(DOM.switchToRegister, 'click', (e) => {
         e.preventDefault();
@@ -385,7 +384,6 @@ window.setupEventListeners = function() {
     // Updated Settings/Profile interactions
     const btnExportProfile = document.getElementById('btnExport');
     const btnImportProfile = document.getElementById('btnImport');
-    bindById('btnEnrollPasskey', 'click', () => { if (window.enrollPasskey) window.enrollPasskey(); });
     
     bind(btnExportProfile, 'click', () => { 
         closeModal('authModal'); 
