@@ -1,7 +1,18 @@
 // Storage Management
 window.loadState = function() {
-    // Reset to defaults - NO LOCALSTORAGE
-    appState.settings = { ...DEFAULT_SETTINGS };
+    // Load settings from local storage for UI preferences (like Dark Mode)
+    try {
+        const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+        if (storedSettings) {
+            appState.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(storedSettings) };
+        } else {
+            appState.settings = { ...DEFAULT_SETTINGS };
+        }
+    } catch (e) {
+        console.error('[Storage] Error loading settings', e);
+        appState.settings = { ...DEFAULT_SETTINGS };
+    }
+
     appState.tokens = []; 
     appState.activities = [];
 };
@@ -17,8 +28,17 @@ window.saveTokens = function() {
 };
 
 window.saveSettings = function() {
-    // NO LOCALSTORAGE - Settings are managed via appState and synced to cloud in sync.js
-    console.log('[Storage] Settings updated in memory');
+    // Save settings locally for UI state persistance (e.g. Dark Mode)
+    try {
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(appState.settings));
+    } catch (e) {
+        console.error('[Storage] Failed to save settings to localStorage', e);
+    }
+
+    // Sync to cloud if logged in
+    if (appState.currentUser && window.pushToCloud) {
+        window.pushToCloud();
+    }
 };
 
 window.saveActivity = function(activity) {
