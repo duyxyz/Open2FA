@@ -15,7 +15,6 @@
 @media (hover: hover) and (pointer: fine) {
   .token-card:hover {
     border-color: var(--primary);
-    transform: scale(1.02);
     box-shadow: var(--shadow-md);
     z-index: 10;
   }
@@ -282,7 +281,6 @@
     background: var(--bg-tertiary);
     border-color: var(--primary);
     color: var(--primary);
-    transform: scale(1.05);
   }
 }
 
