@@ -402,10 +402,6 @@ window.setupEventListeners = function() {
 
     bind(DOM.darkModeToggle, 'change', toggleTheme);
 
-    // 3. Empty State Buttons
-    bindById('btnEmptyAdd', 'click', () => openModal('addTokenModal'));
-    bindById('btnEmptyImport', 'click', () => openModal('importModal'));
-
     // 4. Modal Actions
     bindById('btnSaveToken', 'click', handleSaveToken);
     bindById('btnUpdateToken', 'click', handleUpdateToken);
