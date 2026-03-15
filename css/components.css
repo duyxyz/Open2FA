@@ -1308,9 +1308,15 @@ input:checked+.slider:before {
     width: 140px;
   }
 
-  .token-timer {
-    width: 28px;
-    height: 28px;
+  .token-timer,
+  .edit-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
   }
 
   .modal-container {
