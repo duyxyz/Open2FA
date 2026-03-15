@@ -865,6 +865,44 @@
   border-bottom: none;
 }
 
+.passkey-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+}
+
+.passkey-item:last-child {
+  margin-bottom: 0;
+}
+
+.passkey-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.passkey-info i {
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.passkey-info div p {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.passkey-info div span {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
 .setting-info label {
   font-size: 15px;
   font-weight: 500;

@@ -370,3 +370,30 @@ window.showToast = function (message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 };
+
+window.renderPasskeysList = function(passkeys) {
+  const container = document.getElementById('passkeysContainer');
+  if (!container) return;
+  
+  if (!passkeys || passkeys.length === 0) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+  
+  container.style.display = 'block';
+  container.innerHTML = passkeys.map(p => `
+    <div class="passkey-item">
+      <div class="passkey-info">
+        <i class="fas fa-key"></i>
+        <div>
+          <p>${p.friendly_name || 'Passkey (Vân tay/Khuôn mặt)'}</p>
+          <span>Đã thêm: ${new Date(p.created_at).toLocaleDateString('vi-VN')}</span>
+        </div>
+      </div>
+      <button class="btn-ghost btn-sm" onclick="if(confirm('Bạn có chắc muốn xóa Passkey này?')) window.deletePasskey('${p.id}')" style="color: var(--danger); padding: 4px 8px;" title="Xóa Passkey">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  `).join('');
+};
