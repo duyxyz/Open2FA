@@ -53,7 +53,7 @@ function updateAuthUI(isLoggedIn) {
         DOM.btnAuth.style.display = 'none';
         DOM.userProfile.style.display = 'flex';
         
-        if (emptyAuthView) emptyAuthView.style.display = 'block';
+        if (emptyAuthView) emptyAuthView.style.display = 'flex';
         if (emptyUnauthView) emptyUnauthView.style.display = 'none';
         
         const user = appState.currentUser;
