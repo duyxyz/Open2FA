@@ -437,6 +437,15 @@ body.no-scroll {
     grid-template-columns: 1fr; /* Full width on mobile for better visibility */
     gap: 16px;
   }
+
+  .header .btn-icon,
+  .header .btn-avatar {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    min-width: 40px;
+    min-height: 40px;
+  }
 }
 
 
