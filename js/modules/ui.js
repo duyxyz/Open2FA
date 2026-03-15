@@ -342,6 +342,11 @@ window.showCopyFeedback = function () {
 };
 
 window.showToast = function (message, type = 'info') {
+  if (type === 'copy') {
+    const existingToasts = DOM.toastContainer.querySelectorAll('.toast.copy');
+    existingToasts.forEach(t => t.remove());
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
 
