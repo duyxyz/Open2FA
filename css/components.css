@@ -838,6 +838,35 @@
   background: var(--bg-primary);
 }
 
+@media (max-width: 768px) {
+  #addTokenModal .modal-body {
+    display: flex;
+    flex-direction: column;
+  }
+  #addTokenModal .tab-content.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  #addTokenModal .qr-scanner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  #addTokenModal .qr-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-bottom: 0;
+  }
+  #addTokenModal .qr-input-wrapper textarea {
+    flex: 1;
+    min-height: 150px;
+    margin-bottom: 0;
+  }
+}
+
 /* Settings */
 .settings-section {
   margin-bottom: 24px;
