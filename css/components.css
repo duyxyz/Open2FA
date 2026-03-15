@@ -12,6 +12,15 @@
   -webkit-user-drag: element;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .token-card:hover {
+    border-color: var(--primary);
+    transform: scale(1.02);
+    box-shadow: var(--shadow-md);
+    z-index: 10;
+  }
+}
+
 .token-card:active {
   cursor: grabbing;
 }
@@ -270,11 +279,10 @@
 
 @media (hover: hover) and (pointer: fine) {
   .edit-btn:hover {
-    background: var(--primary);
+    background: var(--bg-tertiary);
     border-color: var(--primary);
-    color: var(--on-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+    color: var(--primary);
+    transform: scale(1.05);
   }
 }
 
