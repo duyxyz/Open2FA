@@ -213,10 +213,12 @@ window.attachTokenEvents = function() {
     document.querySelectorAll('.token-card').forEach(card => {
       card.addEventListener('click', async (e) => {
         const id = card.dataset.id;
-        const otp = document.getElementById(`otp-${id}`)?.textContent;
+        const otpElement = card.querySelector('.token-otp-value');
+        const otp = otpElement ? otpElement.textContent : null;
         
         if (otp && otp !== '------') {
           await navigator.clipboard.writeText(otp);
+          showCopyFeedback();
           const token = appState.tokens.find(t => t.id === id);
           saveActivity({ type: 'copy', text: `Sao chép mã: ${token?.name}` });
         }
