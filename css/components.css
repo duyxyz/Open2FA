@@ -502,8 +502,9 @@
   max-height: 100dvh;
   border-radius: 0;
   transform: translateX(100%);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   border-left: none;
+  opacity: 1; /* Always visible to slide in solidly */
 }
 
 @media (min-width: 769px) {
@@ -567,7 +568,7 @@
 }
 
 .modal.side-panel[aria-hidden="false"] .modal-container {
-  opacity: 1;
+  opacity: 1; /* Keeping for PC safety, but slide handles visibility on mobile */
 }
 
 @media (max-width: 768px) {

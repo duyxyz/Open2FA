@@ -1,17 +1,17 @@
 // UI functions
-window.initAppLayout = function() {
-    renderSkeletons();
-    
-    // Delayed actual render for visual effect
-    setTimeout(() => {
-        renderTokens(true);
-        startTokenUpdate();
-        updateStats();
-    }, 600);
+window.initAppLayout = function () {
+  renderSkeletons();
+
+  // Delayed actual render for visual effect
+  setTimeout(() => {
+    renderTokens(true);
+    startTokenUpdate();
+    updateStats();
+  }, 600);
 };
 
-window.renderSkeletons = function() {
-    const skeletonHTML = Array(8).fill(0).map(() => `
+window.renderSkeletons = function () {
+  const skeletonHTML = Array(8).fill(0).map(() => `
         <div class="token-card is-loading">
             <div class="token-card-header">
                 <div class="token-icon skeleton"></div>
@@ -28,152 +28,152 @@ window.renderSkeletons = function() {
             </div>
         </div>
     `).join('');
-    DOM.tokenGrid.innerHTML = skeletonHTML;
-    DOM.emptyState.classList.remove('active');
+  DOM.tokenGrid.innerHTML = skeletonHTML;
+  DOM.emptyState.classList.remove('active');
 };
 
-window.applyTheme = function() {
-    if (appState.settings.darkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      if(document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = true;
+window.applyTheme = function () {
+  if (appState.settings.darkMode) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = true;
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    if (document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = false;
+  }
+};
+
+window.toggleTheme = function () {
+  appState.settings.darkMode = !appState.settings.darkMode;
+  saveSettings();
+  applyTheme();
+};
+
+window.switchTab = function (tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+};
+
+window.openModal = function (modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+  if ((modalId === 'addTokenModal' || modalId === 'exportModal') && !appState.currentUser) {
+    showToast('Vui lòng đăng nhập để sử dụng tính năng này', 'info');
+    // When opening authModal from a restricted action, show it as modal, not dropdown
+    document.getElementById('authModal').classList.remove('dropdown');
+    document.getElementById('authModal').setAttribute('aria-hidden', 'false');
+    return;
+  }
+
+  // Special handling for authModal and addTokenModal to show as dropdown
+  if ((modalId === 'authModal' && appState.currentUser) || modalId === 'addTokenModal') {
+    modal.classList.add('dropdown');
+  } else {
+    modal.classList.remove('dropdown');
+  }
+
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('no-scroll');
+
+  // Auto focus search input
+  if (modalId === 'searchModal') {
+    const input = document.getElementById('modalSearchInput');
+    if (input) setTimeout(() => input.focus(), 400);
+  }
+};
+
+window.closeModal = function (modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('no-scroll');
+};
+
+window.resetTokenForm = function () {
+  document.getElementById('tokenName').value = '';
+  document.getElementById('tokenAccount').value = '';
+  document.getElementById('tokenSecret').value = '';
+  document.getElementById('tokenIcon').value = '';
+};
+
+window.generateId = function () {
+  return 'token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+};
+
+window.renderTokens = function (force = false) {
+  const totalTokens = appState.tokens.length;
+
+  const currentCardsCount = DOM.tokenGrid.children.length;
+
+  if (totalTokens === 0) {
+    DOM.tokenGrid.innerHTML = '';
+    DOM.emptyState.classList.add('active');
+    return;
+  }
+
+  DOM.emptyState.classList.remove('active');
+
+  if (force || totalTokens !== currentCardsCount) {
+    DOM.tokenGrid.innerHTML = appState.tokens.map((token, index) => createTokenCard(token, index)).join('');
+    attachTokenEvents();
+    updateTokens();
+  }
+
+  const filteredIds = new Set(filterTokens(appState.tokens).map(t => t.id));
+
+  Array.from(DOM.tokenGrid.children).forEach(card => {
+    const id = card.dataset.id;
+    if (filteredIds.has(id)) {
+      card.style.display = '';
+      card.classList.remove('filtering');
     } else {
-      document.documentElement.removeAttribute('data-theme');
-      if(document.getElementById('darkModeToggle')) document.getElementById('darkModeToggle').checked = false;
+      card.style.display = 'none';
     }
+  });
 };
 
-window.toggleTheme = function() {
-    appState.settings.darkMode = !appState.settings.darkMode;
-    saveSettings();
-    applyTheme();
+window.filterTokens = function (tokens, source = 'header') {
+  const inputId = source === 'modal' ? 'modalSearchInput' : 'searchInput';
+  const input = document.getElementById(inputId);
+  const query = (input?.value || '').toLowerCase();
+
+  return tokens.filter(token => {
+    const matchesSearch = !query ||
+      token.name.toLowerCase().includes(query) ||
+      token.account.toLowerCase().includes(query) ||
+      (token.issuer && token.issuer.toLowerCase().includes(query));
+
+    return matchesSearch;
+  });
 };
 
-window.switchTab = function(tabName) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
-    document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-    document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+window.renderSearchResults = function () {
+  const modalGrid = document.getElementById('modalSearchGrid');
+  const emptyState = document.getElementById('searchEmptyState');
+  if (!modalGrid) return;
+
+  const filtered = filterTokens(appState.tokens, 'modal');
+
+  if (filtered.length === 0) {
+    modalGrid.innerHTML = '';
+    if (emptyState) emptyState.style.display = 'block';
+  } else {
+    if (emptyState) emptyState.style.display = 'none';
+    modalGrid.innerHTML = filtered.map((token, index) => createTokenCard(token, index)).join('');
+    attachTokenEvents();
+    updateTokens();
+  }
 };
 
-window.openModal = function(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
+window.createTokenCard = function (token, index) {
+  const firstChar = token.name.charAt(0).toUpperCase();
+  const iconContent = token.iconUrl
+    ? `<img src="${token.iconUrl}" alt="${token.name}" class="token-icon-img" onerror="this.parentElement.innerHTML='${firstChar}'">`
+    : `<span>${firstChar}</span>`;
 
-    if ((modalId === 'addTokenModal' || modalId === 'exportModal') && !appState.currentUser) {
-        showToast('Vui lòng đăng nhập để sử dụng tính năng này', 'info');
-        // When opening authModal from a restricted action, show it as modal, not dropdown
-        document.getElementById('authModal').classList.remove('dropdown');
-        document.getElementById('authModal').setAttribute('aria-hidden', 'false');
-        return;
-    }
-
-    // Special handling for authModal and addTokenModal to show as dropdown
-    if ((modalId === 'authModal' && appState.currentUser) || modalId === 'addTokenModal') {
-        modal.classList.add('dropdown');
-    } else {
-        modal.classList.remove('dropdown');
-    }
-
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('no-scroll');
-
-    // Auto focus search input
-    if (modalId === 'searchModal') {
-        const input = document.getElementById('modalSearchInput');
-        if (input) setTimeout(() => input.focus(), 400);
-    }
-};
-
-window.closeModal = function(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('no-scroll');
-};
-
-window.resetTokenForm = function() {
-    document.getElementById('tokenName').value = '';
-    document.getElementById('tokenAccount').value = '';
-    document.getElementById('tokenSecret').value = '';
-    document.getElementById('tokenIcon').value = '';
-};
-
-window.generateId = function() {
-    return 'token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-};
-
-window.renderTokens = function(force = false) {
-    const totalTokens = appState.tokens.length;
-    
-    const currentCardsCount = DOM.tokenGrid.children.length;
-    
-    if (totalTokens === 0) {
-        DOM.tokenGrid.innerHTML = '';
-        DOM.emptyState.classList.add('active');
-        return;
-    }
-
-    DOM.emptyState.classList.remove('active');
-
-    if (force || totalTokens !== currentCardsCount) {
-        DOM.tokenGrid.innerHTML = appState.tokens.map((token, index) => createTokenCard(token, index)).join('');
-        attachTokenEvents();
-        updateTokens();
-    }
-
-    const filteredIds = new Set(filterTokens(appState.tokens).map(t => t.id));
-    
-    Array.from(DOM.tokenGrid.children).forEach(card => {
-        const id = card.dataset.id;
-        if (filteredIds.has(id)) {
-            card.style.display = '';
-            card.classList.remove('filtering');
-        } else {
-            card.style.display = 'none';
-        }
-    });
-};
-
-window.filterTokens = function(tokens, source = 'header') {
-    const inputId = source === 'modal' ? 'modalSearchInput' : 'searchInput';
-    const input = document.getElementById(inputId);
-    const query = (input?.value || '').toLowerCase();
-
-    return tokens.filter(token => {
-      const matchesSearch = !query || 
-        token.name.toLowerCase().includes(query) ||
-        token.account.toLowerCase().includes(query) ||
-        (token.issuer && token.issuer.toLowerCase().includes(query));
-      
-      return matchesSearch;
-    });
-};
-
-window.renderSearchResults = function() {
-    const modalGrid = document.getElementById('modalSearchGrid');
-    const emptyState = document.getElementById('searchEmptyState');
-    if (!modalGrid) return;
-
-    const filtered = filterTokens(appState.tokens, 'modal');
-    
-    if (filtered.length === 0) {
-        modalGrid.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-    } else {
-        if (emptyState) emptyState.style.display = 'none';
-        modalGrid.innerHTML = filtered.map((token, index) => createTokenCard(token, index)).join('');
-        attachTokenEvents();
-        updateTokens();
-    }
-};
-
-window.createTokenCard = function(token, index) {
-    const firstChar = token.name.charAt(0).toUpperCase();
-    const iconContent = token.iconUrl 
-      ? `<img src="${token.iconUrl}" alt="${token.name}" class="token-icon-img" onerror="this.parentElement.innerHTML='${firstChar}'">`
-      : `<span>${firstChar}</span>`;
-    
-    return `
+  return `
       <div class="token-card" data-id="${token.id}" draggable="true" style="animation-delay: ${index * 0.05}s">
         <md-ripple></md-ripple>
         <div class="token-card-header">
@@ -201,165 +201,168 @@ window.createTokenCard = function(token, index) {
     `;
 };
 
-window.attachTokenEvents = function() {
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        openEditModal(id);
-      });
+window.attachTokenEvents = function () {
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      openEditModal(id);
+    });
+  });
+
+  document.querySelectorAll('.token-card').forEach(card => {
+    card.addEventListener('click', async (e) => {
+      const id = card.dataset.id;
+      const otpElement = card.querySelector('.token-otp-value');
+      const otp = otpElement ? otpElement.textContent : null;
+
+      if (otp && otp !== '------') {
+        await navigator.clipboard.writeText(otp);
+        showCopyFeedback();
+        const token = appState.tokens.find(t => t.id === id);
+        saveActivity({ type: 'copy', text: `Sao chép mã: ${token?.name}` });
+      }
     });
 
-    document.querySelectorAll('.token-card').forEach(card => {
-      card.addEventListener('click', async (e) => {
-        const id = card.dataset.id;
-        const otpElement = card.querySelector('.token-otp-value');
-        const otp = otpElement ? otpElement.textContent : null;
-        
-        if (otp && otp !== '------') {
-          await navigator.clipboard.writeText(otp);
-          showCopyFeedback();
-          const token = appState.tokens.find(t => t.id === id);
-          saveActivity({ type: 'copy', text: `Sao chép mã: ${token?.name}` });
-        }
-      });
-
-      card.addEventListener('dragstart', (e) => {
-        card.classList.add('dragging');
-        e.dataTransfer.setData('text/plain', card.dataset.id);
-        e.dataTransfer.effectAllowed = 'move';
-      });
-
-      card.addEventListener('dragend', () => {
-        card.classList.remove('dragging');
-        document.querySelectorAll('.token-card').forEach(c => c.classList.remove('drag-over'));
-      });
-
-      card.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        const draggingCard = document.querySelector('.token-card.dragging');
-        if (draggingCard && draggingCard !== card) {
-          card.classList.add('drag-over');
-        }
-      });
-
-      card.addEventListener('dragleave', () => {
-        card.classList.remove('drag-over');
-      });
-
-      card.addEventListener('drop', (e) => {
-        e.preventDefault();
-        card.classList.remove('drag-over');
-        const draggedId = e.dataTransfer.getData('text/plain');
-        
-        if (draggedId && draggedId !== card.dataset.id) {
-            reorderTokens(draggedId, card.dataset.id);
-        }
-      });
+    card.addEventListener('dragstart', (e) => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', card.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
     });
+
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      document.querySelectorAll('.token-card').forEach(c => c.classList.remove('drag-over'));
+    });
+
+    card.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const draggingCard = document.querySelector('.token-card.dragging');
+      if (draggingCard && draggingCard !== card) {
+        card.classList.add('drag-over');
+      }
+    });
+
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over');
+    });
+
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      const draggedId = e.dataTransfer.getData('text/plain');
+
+      if (draggedId && draggedId !== card.dataset.id) {
+        reorderTokens(draggedId, card.dataset.id);
+      }
+    });
+  });
 };
 
-window.reorderTokens = function(draggedId, targetId) {
-    const tokens = [...appState.tokens];
-    const draggedIndex = tokens.findIndex(t => t.id === draggedId);
-    const targetIndex = tokens.findIndex(t => t.id === targetId);
+window.reorderTokens = function (draggedId, targetId) {
+  const tokens = [...appState.tokens];
+  const draggedIndex = tokens.findIndex(t => t.id === draggedId);
+  const targetIndex = tokens.findIndex(t => t.id === targetId);
 
-    if (draggedIndex !== -1 && targetIndex !== -1) {
-        const [removed] = tokens.splice(draggedIndex, 1);
-        tokens.splice(targetIndex, 0, removed);
-        
-        appState.tokens = tokens;
-        saveTokens();
-        
-        setTimeout(() => {
-            renderTokens(true);
-            saveActivity({ type: 'reorder', text: `Đổi vị trí: ${removed.name}` });
-            showToast('Đã đổi vị trí', 'success');
-        }, 50);
-    }
+  if (draggedIndex !== -1 && targetIndex !== -1) {
+    const [removed] = tokens.splice(draggedIndex, 1);
+    tokens.splice(targetIndex, 0, removed);
+
+    appState.tokens = tokens;
+    saveTokens();
+
+    setTimeout(() => {
+      renderTokens(true);
+      saveActivity({ type: 'reorder', text: `Đổi vị trí: ${removed.name}` });
+      showToast('Đã đổi vị trí', 'success');
+    }, 50);
+  }
 };
 
-window.openEditModal = function(id) {
-    const token = appState.tokens.find(t => t.id === id);
-    if (!token) return;
+window.openEditModal = function (id) {
+  const token = appState.tokens.find(t => t.id === id);
+  if (!token) return;
 
-    document.getElementById('editTokenId').value = token.id;
-    document.getElementById('editTokenName').value = token.name;
-    document.getElementById('editTokenAccount').value = token.account;
-    document.getElementById('editTokenIcon').value = token.iconUrl || '';
+  document.getElementById('editTokenId').value = token.id;
+  document.getElementById('editTokenName').value = token.name;
+  document.getElementById('editTokenAccount').value = token.account;
+  document.getElementById('editTokenIcon').value = token.iconUrl || '';
 
-    openModal('editTokenModal');
+  openModal('editTokenModal');
 };
 
 // function window.updateStats removed as per cloud-only requirement
 
 
 let updateInterval;
-window.startTokenUpdate = function() {
-    if (updateInterval) clearInterval(updateInterval);
-    updateTokens();
-    updateInterval = setInterval(updateTokens, 50); 
+window.startTokenUpdate = function () {
+  if (updateInterval) clearInterval(updateInterval);
+  updateTokens();
+  updateInterval = setInterval(updateTokens, 50);
 };
 
-window.updateTokens = async function() {
-    const timeRemaining = TOTP.getTimeRemaining(30);
-    const percentage = (timeRemaining / 30) * 100;
-    const fullTime = Math.floor(Date.now() / 1000);
+window.updateTokens = async function () {
+  const timeRemaining = TOTP.getTimeRemaining(30);
+  const percentage = (timeRemaining / 30) * 100;
+  const fullTime = Math.floor(Date.now() / 1000);
 
-    const tokenCards = document.querySelectorAll('.token-card');
-    
-    // Group elements by token ID to avoid redundant calculations
-    const tokenGroups = {};
-    appState.tokens.forEach(t => tokenGroups[t.id] = t);
+  const tokenCards = document.querySelectorAll('.token-card');
 
-    tokenCards.forEach(card => {
-        const id = card.dataset.id;
-        const token = tokenGroups[id];
-        if (!token) return;
+  // Group elements by token ID to avoid redundant calculations
+  const tokenGroups = {};
+  appState.tokens.forEach(t => tokenGroups[t.id] = t);
 
-        const otpElement = card.querySelector('.token-otp-value');
-        const timerCircle = card.querySelector('.token-timer-circle');
+  tokenCards.forEach(card => {
+    const id = card.dataset.id;
+    const token = tokenGroups[id];
+    if (!token) return;
 
-        if (otpElement && (!otpElement.lastUpdate || otpElement.lastUpdate !== fullTime)) {
-            TOTP.generateAsync(token.secret).then(code => {
-                otpElement.textContent = code;
-                otpElement.lastUpdate = fullTime;
-            });
-        }
+    const otpElement = card.querySelector('.token-otp-value');
+    const timerCircle = card.querySelector('.token-timer-circle');
 
-        if (timerCircle) {
-            const circumference = 50.265;
-            const offset = (percentage / 100) * circumference;
-            timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
-            timerCircle.style.stroke = 'var(--timer-color)';
-        }
-    });
+    if (otpElement && (!otpElement.lastUpdate || otpElement.lastUpdate !== fullTime)) {
+      TOTP.generateAsync(token.secret).then(code => {
+        otpElement.textContent = code;
+        otpElement.lastUpdate = fullTime;
+      });
+    }
+
+    if (timerCircle) {
+      const circumference = 50.265;
+      const offset = (percentage / 100) * circumference;
+      timerCircle.style.strokeDasharray = `${offset} ${circumference}`;
+      timerCircle.style.stroke = 'var(--timer-color)';
+    }
+  });
 };
 
-window.showCopyFeedback = function() {
-    showToast('Đã sao chép!', 'copy');
+window.showCopyFeedback = function () {
+  showToast('Đã sao chép', 'copy');
 };
 
-window.showToast = function(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    let icon = 'info-circle';
-    if (type === 'success') icon = 'check-circle';
-    else if (type === 'error') icon = 'exclamation-circle';
-    else if (type === 'copy') icon = 'check';
+window.showToast = function (message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
 
+  let icon = 'info-circle';
+  if (type === 'success') icon = 'check-circle';
+  else if (type === 'error') icon = 'exclamation-circle';
+
+  if (type === 'copy') {
+    toast.innerHTML = `${message}`;
+  } else {
     toast.innerHTML = `
-      <i class="fas fa-${icon}"></i>
-      ${message}
-    `;
-    
-    DOM.toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(20px)';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+        <i class="fas fa-${icon}"></i>
+        ${message}
+      `;
+  }
+
+  DOM.toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 };
