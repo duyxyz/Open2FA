@@ -54,7 +54,11 @@ window.setupImportDropzone = function() {
     const fileInput = document.getElementById('importFile');
     if (!dropzone || !fileInput) return;
 
-    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('click', (e) => {
+        if (e.target.tagName.toLowerCase() !== 'label') {
+            fileInput.click();
+        }
+    });
     
     dropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -74,7 +78,9 @@ window.setupImportDropzone = function() {
 
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) handleImportFile(file);
+      if (file) {
+          handleImportFile(file);
+      }
     });
 
     const btnConfirm = document.getElementById('btnConfirmImport');
