@@ -16,11 +16,6 @@ window.initSync = async function() {
         supabaseClient.auth.onAuthStateChange((event, session) => {
             handleAuthStateChange(event, session);
         });
-        
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            handleAuthStateChange('SIGNED_IN', session);
-        }
     } catch (error) {
         console.error('Supabase init error:', error);
     }
@@ -98,7 +93,7 @@ function subscribeToUserSync(userId) {
                 table: 'tokens_sync',
                 filter: `user_id=eq.${userId}`
             },
-            () => loadFromCloud()
+            () => loadFromCloud(true)
         )
         .subscribe();
 }
@@ -197,34 +192,36 @@ function updateSyncStatus(status) {
 // === CLOUD IS SOURCE OF TRUTH ===
 
 // Load token list from Supabase and replace local state
-async function loadFromCloud() {
+async function loadFromCloud(fromRealtime = false) {
     if (!supabaseClient || !appState.currentUser) return;
 
     updateSyncStatus('syncing');
     try {
-        const { data, error } = await supabaseClient
+        const { data: rows, error } = await supabaseClient
             .from('tokens_sync')
             .select('data')
             .eq('user_id', appState.currentUser.id)
-            .single();
+            .limit(1);
 
         if (error) {
-            if (error.code === 'PGRST116') {
-                // No data in cloud yet. If we have local tokens, upload them.
-                console.log('[Sync] No cloud data. Uploading local tokens if any.');
-                if (appState.tokens.length > 0) {
-                    await saveToCloud(appState.tokens);
-                } else {
-                    updateSyncStatus('success');
-                }
+            console.error('[Sync] Pull error:', error);
+            updateSyncStatus('error');
+            showToast('Lỗi đọc dữ liệu từ đám mây: ' + error.message, 'error');
+            return;
+        }
+
+        if (!rows || rows.length === 0) {
+            // No data in cloud yet.
+            if (!fromRealtime && appState.tokens.length > 0) {
+                console.log('[Sync] No cloud data. Uploading local tokens.');
+                await saveToCloud(appState.tokens);
             } else {
-                console.error('[Sync] Pull error:', error);
-                updateSyncStatus('error');
-                showToast('Lỗi đọc dữ liệu từ đám mây: ' + error.message, 'error');
+                updateSyncStatus('success');
             }
             return;
         }
 
+        const data = rows[0];
         if (data && data.data) {
             const decryptedTokens = await decryptTokens(data.data);
             if (decryptedTokens) {
