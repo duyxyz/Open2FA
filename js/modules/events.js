@@ -346,6 +346,12 @@ window.setupEventListeners = function() {
         if (DOM.btnAuthSubmit) DOM.btnAuthSubmit.textContent = 'Đăng nhập';
         if (DOM.authView) DOM.authView.style.display = 'block';
         if (DOM.profileView) DOM.profileView.style.display = 'none';
+        
+        const confirmGroup = document.getElementById('confirmPasswordGroup');
+        const confirmInput = document.getElementById('authConfirmPassword');
+        if (confirmGroup) confirmGroup.style.display = 'none';
+        if (confirmInput) confirmInput.required = false;
+
         openModal('authModal');
     });
 
@@ -359,6 +365,11 @@ window.setupEventListeners = function() {
         if (DOM.btnAuthSubmit) DOM.btnAuthSubmit.textContent = appState.isRegisterMode ? 'Đăng ký' : 'Đăng nhập';
         if (DOM.switchToRegister) DOM.switchToRegister.textContent = appState.isRegisterMode ? 'Đăng nhập ngay' : 'Đăng ký ngay';
         if (DOM.authSwitchText) DOM.authSwitchText.textContent = appState.isRegisterMode ? 'Đã có tài khoản? ' : 'Chưa có tài khoản? ';
+        
+        const confirmGroup = document.getElementById('confirmPasswordGroup');
+        const confirmInput = document.getElementById('authConfirmPassword');
+        if (confirmGroup) confirmGroup.style.display = appState.isRegisterMode ? 'block' : 'none';
+        if (confirmInput) confirmInput.required = appState.isRegisterMode;
     });
 
     if (DOM.authForm) DOM.authForm.addEventListener('submit', (e) => window.handleAuthAction(e));

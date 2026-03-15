@@ -1086,22 +1086,40 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   gap: 10px;
-  animation: slideIn 0.3s ease;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: auto;
-  /* Re-enable clicks on toast */
   transform: translateX(0);
-  /* Final state ensure */
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translate(20px, 10px);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate(0, 0);
+  }
+}
+
+.toast.hiding {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(20px, 0);
   }
 }
 

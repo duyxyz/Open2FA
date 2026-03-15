@@ -361,8 +361,7 @@ window.showToast = function (message, type = 'info') {
   DOM.toastContainer.appendChild(toast);
 
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(20px)';
+    toast.classList.add('hiding');
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 };

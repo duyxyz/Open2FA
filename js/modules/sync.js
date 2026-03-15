@@ -109,6 +109,14 @@ window.handleAuthAction = async function(e, type = 'modal') {
     const password = type === 'gate' ? document.getElementById('gatePassword').value : DOM.authPassword.value;
     const btnSubmit = type === 'gate' ? document.getElementById('btnGateSubmit') : DOM.btnAuthSubmit;
     
+    if (appState.isRegisterMode && type === 'modal') {
+        const confirmPassword = document.getElementById('authConfirmPassword').value;
+        if (password !== confirmPassword) {
+            showToast('Mật khẩu xác nhận không khớp', 'error');
+            return;
+        }
+    }
+
     if (btnSubmit) {
         btnSubmit.disabled = true;
         btnSubmit.textContent = appState.isRegisterMode ? 'Đang đăng ký...' : 'Đang đăng nhập...';
