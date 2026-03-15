@@ -598,7 +598,7 @@
 }
 
 .modal-header {
-  padding: 20px 24px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -606,8 +606,8 @@
 }
 
 .modal-header h2 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -615,6 +615,7 @@
 
 .modal-header h2 i {
   color: var(--primary);
+  font-size: 24px;
 }
 
 .modal-close {
