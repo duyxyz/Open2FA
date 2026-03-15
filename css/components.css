@@ -646,11 +646,14 @@
 }
 
 .modal-footer {
-  padding: 16px 24px;
+  padding: 12px 24px;
   border-top: 1px solid var(--border);
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 12px;
+  background: var(--bg-primary);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
 /* Tabs */
