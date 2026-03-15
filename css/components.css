@@ -116,14 +116,6 @@
   display: none;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .token-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
-  }
-}
-
 .token-card-header {
   display: flex;
   align-items: center;
@@ -1206,12 +1198,6 @@ input:checked+.slider:before {
 
   .token-card:last-child {
     border-bottom: none;
-  }
-
-  .token-card:hover {
-    transform: none;
-    box-shadow: none;
-    background-color: var(--bg-primary); /* Disable grey flash on tap toggle */
   }
 
   .token-card-header {
