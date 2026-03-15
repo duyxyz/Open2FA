@@ -533,6 +533,32 @@
   .modal-sm.modal-container {
     max-width: 400px;
   }
+
+  /* Dropdown Variant (for Auth Modal) */
+  .modal.dropdown {
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-top: 70px;
+    padding-right: 20px;
+  }
+  
+  .modal.dropdown .modal-overlay {
+    background: transparent;
+  }
+  
+  .modal.dropdown .modal-container {
+    width: 380px;
+    height: auto;
+    max-height: calc(100vh - 90px);
+    border-radius: var(--radius-xl);
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-xl), 0 0 0 1px var(--border);
+    border-left: none;
+  }
+  
+  .modal.dropdown[aria-hidden="false"] .modal-container {
+    transform: translateY(0);
+  }
 }
 
 .modal.side-panel[aria-hidden="false"] .modal-container {
