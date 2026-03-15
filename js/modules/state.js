@@ -38,7 +38,6 @@ window.cacheDOMElements = function() {
 
 
     DOM.toastContainer = document.getElementById('toastContainer');
-    DOM.copyFeedback = document.getElementById('copyFeedback');
     DOM.syncStatusDot = document.getElementById('syncStatusDot');
     
     DOM.darkModeToggle = document.getElementById('darkModeToggle');

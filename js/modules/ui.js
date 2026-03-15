@@ -338,17 +338,20 @@ window.updateTokens = async function() {
 };
 
 window.showCopyFeedback = function() {
-    DOM.copyFeedback.classList.add('show');
-    setTimeout(() => {
-      DOM.copyFeedback.classList.remove('show');
-    }, 1000);
+    showToast('Đã sao chép!', 'copy');
 };
 
 window.showToast = function(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    
+    let icon = 'info-circle';
+    if (type === 'success') icon = 'check-circle';
+    else if (type === 'error') icon = 'exclamation-circle';
+    else if (type === 'copy') icon = 'check';
+
     toast.innerHTML = `
-      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+      <i class="fas fa-${icon}"></i>
       ${message}
     `;
     
