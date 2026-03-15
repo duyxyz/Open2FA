@@ -89,18 +89,21 @@
           </div>
           
           <button id="btnAddToken" class="btn-icon" title="Thêm token">
+            <md-ripple></md-ripple>
             <i class="fas fa-plus"></i>
           </button>
 
           <div class="user-profile" id="userProfile" style="display: none;">
             <div class="avatar-wrapper">
               <button id="btnUser" class="btn-avatar">
+                <md-ripple></md-ripple>
                 <span id="userInitial">U</span>
               </button>
               <span id="syncStatusDot" class="status-dot-avatar"></span>
             </div>
           </div>
           <button id="btnAuth" class="btn-primary btn-sm" style="margin-left: 8px;">
+            <md-ripple></md-ripple>
             <i class="fas fa-user-circle"></i> Đăng nhập
           </button>
         </div>
@@ -117,9 +120,11 @@
           <p>Thêm token đầu tiên của bạn bằng cách quét mã QR hoặc nhập thủ công</p>
           <div class="empty-actions">
             <button id="btnEmptyAdd" class="btn-primary">
+              <md-ripple></md-ripple>
               <i class="fas fa-plus"></i> Thêm token
             </button>
             <button id="btnEmptyImport" class="btn-secondary">
+              <md-ripple></md-ripple>
               <i class="fas fa-file-import"></i> Nhập khẩu
             </button>
           </div>
@@ -255,6 +260,7 @@
         <div class="modal-body">
           <div class="export-options">
             <button class="export-option" id="btnExportJson">
+              <md-ripple></md-ripple>
               <i class="fas fa-file-code"></i>
               <div class="export-option-info">
                 <h4>JSON</h4>
@@ -262,6 +268,7 @@
               </div>
             </button>
             <button class="export-option" id="btnExportEncrypted">
+              <md-ripple></md-ripple>
               <i class="fas fa-file-contract"></i>
               <div class="export-option-info">
                 <h4>Mã hóa (AES-256)</h4>
@@ -405,6 +412,7 @@
         <div class="modal-body">
           <div id="authView">
             <button id="btnGoogleLogin" class="btn-secondary w-full" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border: 1px solid var(--border);">
+              <md-ripple></md-ripple>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="Google logo">
               Tiếp tục với Google
             </button>
@@ -423,6 +431,7 @@
                 <input type="password" id="authPassword" placeholder="••••••••" required>
               </div>
               <button type="submit" class="btn-primary w-full" id="btnAuthSubmit" style="width: 100%; margin-top: 16px;">
+                <md-ripple></md-ripple>
                 Đăng nhập
               </button>
             </form>
@@ -481,6 +490,7 @@
       </div>
     </div>
 
+  <script src="js/modules/ripple.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/totp.js"></script>
   <script src="js/modules/state.js"></script>

@@ -175,6 +175,7 @@ window.createTokenCard = function(token, index) {
     
     return `
       <div class="token-card" data-id="${token.id}" draggable="true" style="animation-delay: ${index * 0.05}s">
+        <md-ripple></md-ripple>
         <div class="token-card-header">
           <div class="token-icon">${iconContent}</div>
           <div class="token-info">
@@ -211,9 +212,6 @@ window.attachTokenEvents = function() {
 
     document.querySelectorAll('.token-card').forEach(card => {
       card.addEventListener('click', async (e) => {
-        if (window.createRipple) {
-            window.createRipple(e);
-        }
         const id = card.dataset.id;
         const otp = document.getElementById(`otp-${id}`)?.textContent;
         
