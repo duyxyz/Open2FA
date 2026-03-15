@@ -68,7 +68,6 @@ window.cacheDOMElements = function() {
     DOM.userEmailText = document.getElementById('userEmailText');
     DOM.userAvatarLarge = document.getElementById('userAvatarLarge');
     DOM.btnSignOut = document.getElementById('btnSignOut');
-    DOM.autoSyncToggle = document.getElementById('autoSyncToggle');
     DOM.btnEditSyncConfig = document.getElementById('btnEditSyncConfig');
     DOM.authSwitchText = document.getElementById('authSwitchText');
 };
