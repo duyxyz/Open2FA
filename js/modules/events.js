@@ -352,6 +352,8 @@ window.setupEventListeners = function() {
         if (DOM.btnAuthSubmit) DOM.btnAuthSubmit.textContent = 'Đăng nhập';
         if (DOM.authView) DOM.authView.style.display = 'block';
         if (DOM.profileView) DOM.profileView.style.display = 'none';
+        const profileFooter = document.getElementById('profileFooter');
+        if (profileFooter) profileFooter.style.display = 'none';
         
         const confirmGroup = document.getElementById('confirmPasswordGroup');
         const confirmInput = document.getElementById('authConfirmPassword');

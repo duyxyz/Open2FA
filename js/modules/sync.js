@@ -72,6 +72,8 @@ function updateAuthUI(isLoggedIn) {
         DOM.userEmailText.textContent = email;
         if (DOM.authView) DOM.authView.style.display = 'none';
         if (DOM.profileView) DOM.profileView.style.display = 'block';
+        const profileFooter = document.getElementById('profileFooter');
+        if (profileFooter) profileFooter.style.display = 'flex';
         if (DOM.authTitle) DOM.authTitle.textContent = 'Tài khoản';
     } else {
         // App is always shown now
@@ -85,6 +87,8 @@ function updateAuthUI(isLoggedIn) {
         
         if (DOM.authView) DOM.authView.style.display = 'block';
         if (DOM.profileView) DOM.profileView.style.display = 'none';
+        const profileFooter = document.getElementById('profileFooter');
+        if (profileFooter) profileFooter.style.display = 'none';
         if (DOM.authTitle) DOM.authTitle.textContent = appState.isRegisterMode ? 'Đăng ký' : 'Đăng nhập';
     }
 }
