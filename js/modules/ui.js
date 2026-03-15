@@ -6,7 +6,6 @@ window.initAppLayout = function () {
   setTimeout(() => {
     renderTokens(true);
     startTokenUpdate();
-    updateStats();
   }, 600);
 };
 
