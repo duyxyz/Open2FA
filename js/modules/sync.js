@@ -186,6 +186,8 @@ window.signInWithGoogle = async function() {
 
 window.handleSignOut = async function() {
     if (!supabaseClient) return;
+    if (!confirm('Bạn có chắc chắn muốn đăng xuất không?')) return;
+    
     try {
         await supabaseClient.auth.signOut();
         // Clear local tokens on sign out since cloud is source of truth
