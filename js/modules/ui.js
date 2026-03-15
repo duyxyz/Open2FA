@@ -206,6 +206,9 @@ window.createTokenCard = function (token, index) {
 
 window.attachTokenEvents = function () {
   document.querySelectorAll('.edit-btn').forEach(btn => {
+    ['pointerdown', 'pointerup', 'touchstart', 'touchend'].forEach(evt => {
+      btn.addEventListener(evt, (e) => e.stopPropagation());
+    });
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.dataset.id;
